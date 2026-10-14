@@ -77,6 +77,7 @@ input[type="search"], select { font: inherit; color: var(--ink); background: var
 .summary { border-left: 4px solid var(--accent); background: var(--panel); border-radius: 0 10px 10px 0; padding: 14px 16px; display: grid; gap: 6px; }
 .summary .skillname { font-size: 1.35rem; font-weight: 700; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .summary p { margin: 0; max-width: 75ch; }
+.pick { display: inline-flex; align-items: center; gap: 6px; font-size: 1.05rem; }
 .aff { font-size: .75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
 .big { font-family: var(--mono); font-weight: 500; }
 
@@ -195,11 +196,11 @@ const D = JSON.parse(document.getElementById('data').textContent);
 const T = {
   zh: {
     title: '黑夜君臨 戰技尋獲表', sub: '選一個戰技，找出最容易拿到它的地點與武器種',
-    skill: '戰技', search: '搜尋戰技名稱…', cls: '易發現的武器種（影響「職業武器」獎勵欄位）', avg: '角色預設・10 名平均', grpHero: '角色預設', grpType: '指定武器種（深夜模式）',
+    skill: '戰技（可多選，再點一次取消）', pick: '在上方選擇一個或多個戰技。', sep: '、', search: '搜尋戰技名稱…', cls: '易發現的武器種（影響「職業武器」獎勵欄位）', avg: '角色預設・10 名平均', grpHero: '角色預設', grpType: '指定武器種（深夜模式）',
     map: '地圖', mapAll: '全部地圖', limveld: '一般地圖', hollow: '大空洞（DLC）',
     vars: '版本', vbase: '一般', vv: 'Variant 變體', vc: 'Condemned', vx: 'Cataclysm 劇變',
     kinds: '來源', ksite: '有屬性標記的據點（營地・遺跡・大教堂…）', kother: '其他頭目（野外・城・封牢・地變…）',
-    locs: '推薦地點', locsE: '擊敗頭目 → 獎勵選項', hintLocs: '百分比 = 擊敗該頭目後，獎勵選項中至少出現一把帶此戰技的武器的機率。',
+    locs: '推薦地點', locsE: '擊敗頭目 → 獎勵選項', hintLocs: '百分比 = 擊敗該頭目後，獎勵選項中至少出現一把帶所選戰技（任一個）的武器的機率。',
     sub1: '每個選項', detail: '武器種分析', hintTypes: '條件機率 = 在這裡掉出該武器種時，戰技是這一個的機率，依獎勵欄位分開計算。「一般欄位」是所有武器種混抽的欄位；「職業武器欄位」只會出「易發現的武器種」，戰技池可能不同。「占比」= 此戰技的武器中有多少是該武器種。',
     type: '武器種', cond: '條件機率', share: '占比', perDrop: '每次掉落', slotG: '一般欄位', slotK: '職業武器欄位', typeAvg: '武器種平均',
     weps: '個別武器偏差', hintWeps: '同一武器種內，個別武器（例如稀有武器）可能有自己的戰技池或固定戰技，機率會和武器種平均不同（以一般欄位計算）。',
@@ -219,11 +220,11 @@ const T = {
   },
   ja: {
     title: 'ナイトレイン 戦技ファインダー', sub: '戦技を選ぶと、入手しやすい場所と武器種を表示します',
-    skill: '戦技', search: '戦技名で検索…', cls: '見つけやすい武器種（「キャラ武器」報酬枠に影響）', avg: 'キャラ既定・10キャラ平均', grpHero: 'キャラ既定', grpType: '武器種を指定（深き夜）',
+    skill: '戦技（複数選択可・もう一度押すと解除）', pick: '上で戦技を1つ以上選んでください。', sep: '、', search: '戦技名で検索…', cls: '見つけやすい武器種（「キャラ武器」報酬枠に影響）', avg: 'キャラ既定・10キャラ平均', grpHero: 'キャラ既定', grpType: '武器種を指定（深き夜）',
     map: 'マップ', mapAll: 'すべて', limveld: '通常マップ', hollow: '大空洞（DLC）',
     vars: 'バージョン', vbase: '通常', vv: 'Variant 変異', vc: 'Condemned', vx: 'Cataclysm 大変動',
     kinds: '入手元', ksite: '属性マークのある拠点（野営地・遺跡・大教会…）', kother: 'その他のボス（フィールド・城・封牢・地変…）',
-    locs: 'おすすめの場所', locsE: 'ボス撃破 → 報酬の選択肢', hintLocs: '％＝ボス撃破後の報酬の選択肢に、この戦技の武器が少なくとも1つ出る確率。',
+    locs: 'おすすめの場所', locsE: 'ボス撃破 → 報酬の選択肢', hintLocs: '％＝ボス撃破後の報酬の選択肢に、選んだ戦技（いずれか）の武器が少なくとも1つ出る確率。',
     sub1: '各選択肢', detail: '武器種の内訳', hintTypes: '条件付き確率＝ここでその武器種が出たとき、戦技がこれになる確率（報酬枠ごとに計算）。「通常の枠」は全武器種から抽選される枠、「キャラ武器枠」は「見つけやすい武器種」だけが出る枠で、戦技プールが異なる場合があります。「割合」＝この戦技の武器のうち、その武器種が占める割合。',
     type: '武器種', cond: '条件付き確率', share: '割合', perDrop: '1回あたり', slotG: '通常の枠', slotK: 'キャラ武器枠', typeAvg: '武器種の平均',
     weps: '個別武器の偏り', hintWeps: '同じ武器種でも、個別の武器（レア武器など）は独自の戦技表や固定戦技を持つことがあり、確率が武器種の平均と異なります（通常の枠で計算）。',
@@ -243,11 +244,11 @@ const T = {
   },
   en: {
     title: 'Nightreign Skill Finder', sub: 'Pick a skill to see where and on which weapon types it drops most often',
-    skill: 'Skill', search: 'Search skills…', cls: 'Favoured weapon type (class-weapon reward slot)', avg: 'Hero default, average of 10', grpHero: 'Hero default', grpType: 'Chosen type (Deep of Night)',
+    skill: 'Skills (pick one or more; click again to remove)', pick: 'Pick one or more skills above.', sep: ' / ', search: 'Search skills…', cls: 'Favoured weapon type (class-weapon reward slot)', avg: 'Hero default, average of 10', grpHero: 'Hero default', grpType: 'Chosen type (Deep of Night)',
     map: 'Map', mapAll: 'All maps', limveld: 'Limveld', hollow: 'Great Hollow (DLC)',
     vars: 'Version', vbase: 'Normal', vv: 'Variant', vc: 'Condemned', vx: 'Cataclysm',
     kinds: 'Sources', ksite: 'Affinity-marked sites (encampments, ruins, churches…)', kother: 'Other bosses (field, castle, evergaol, shifting earth…)',
-    locs: 'Best places', locsE: 'Boss kill → reward choices', hintLocs: 'Percent = chance that at least one reward choice after the boss is a weapon with this skill.',
+    locs: 'Best places', locsE: 'Boss kill → reward choices', hintLocs: 'Percent = chance that at least one reward choice after the boss is a weapon with any of the selected skills.',
     sub1: 'per choice', detail: 'Weapon types', hintTypes: 'Conditional = if this weapon type drops here, the chance it carries this skill, counted per reward slot. "General slots" roll every weapon type; the "class-weapon slot" only rolls the favoured weapon type and can have a different skill pool. "Share" = how many of this skill\'s drops are this type.',
     type: 'Weapon type', cond: 'Conditional', share: 'Share', perDrop: 'per drop', slotG: 'General slots', slotK: 'Class-weapon slot', typeAvg: 'Type average',
     weps: 'Individual weapon bias', hintWeps: 'Inside one weapon type, some weapons (often rares) have their own skill table or a fixed skill, so their odds differ from the type average (general slots).',
@@ -286,7 +287,7 @@ for (const [id, s] of Object.entries(D.skills)) {
   e.ids.add(+id);
   if (pooled.has(+id)) { e.u = false; e.a = s.a; }
 }
-const st = { skill: 'Thunderbolt', cls: 'avg', map: 'all', vars: new Set(['']), site: true, other: true, sel: null };
+const st = { skills: new Set(['Thunderbolt']), cls: 'avg', map: 'all', vars: new Set(['']), site: true, other: true, sel: null };
 
 const nm = o => (o && (o[lang] || o.en)) || '';
 const pct = (p, d) => (p * 100).toFixed(d == null ? (p >= 0.1 ? 1 : p >= 0.01 ? 2 : 3) : d) + '%';
@@ -361,7 +362,8 @@ function leafInfo(k) {
   return info;
 }
 function analyse(skill) {
-  const ids = SK.get(skill).ids;
+  const ids = new Set();
+  for (const key of skill) for (const id of SK.get(key).ids) ids.add(id);
   const res = [];
   for (const g of D.groups) {
     if (!st.vars.has(g.var)) continue;
@@ -451,7 +453,7 @@ function renderSkills() {
     const label = key === 'unique' ? t.unique : t.affName[key];
     const col = key === 'unique' ? 'var(--accent)' : affColor(key);
     html += `<div class="sgroup"><div class="eyebrow"><span class="dot" style="background:${col}"></span>${label}</div><div class="chips">` +
-      list.map(([id, n]) => `<button type="button" class="chip" data-skill="${esc(id)}" aria-pressed="${id === st.skill}">${esc(n)}</button>`).join('') + '</div></div>';
+      list.map(([id, n]) => `<button type="button" class="chip" data-skill="${esc(id)}" aria-pressed="${st.skills.has(id)}">${esc(n)}</button>`).join('') + '</div></div>';
   }
   $('skilllist').innerHTML = html || `<div class="empty">—</div>`;
 }
@@ -474,14 +476,19 @@ function bestType(r) {
 let lastRes = [];
 function renderResults() {
   const t = T[lang];
-  const res = analyse(st.skill);
+  const clear = () => { $('locs').innerHTML = ''; $('types').innerHTML = ''; $('weps').innerHTML = ''; $('h-detail').textContent = t.detail; $('e-detail').textContent = ''; };
+  if (!st.skills.size) { lastRes = []; $('summary').innerHTML = `<p>${t.pick}</p>`; clear(); return; }
+  const res = analyse(st.skills);
   lastRes = res;
-  const s = SK.get(st.skill);
-  const sName = skillLabel(st.skill);
-  const affKey = s && !s.u ? s.a : null;
-  const affHtml = affKey ? `<span class="aff" style="color:${affColor(affKey)}">${t.affName[affKey]}</span>` : `<span class="aff" style="color:var(--accent)">${t.unique}</span>`;
+  const keys = [...st.skills];
+  const sName = keys.map(skillLabel).join(t.sep);
+  const affHtml = keys.map(k => {
+    const s = SK.get(k), a = s && !s.u ? s.a : null;
+    const badge = a ? `<span class="aff" style="color:${affColor(a)}">${t.affName[a]}</span>` : `<span class="aff" style="color:var(--accent)">${t.unique}</span>`;
+    return keys.length > 1 ? `<span class="pick">${esc(skillLabel(k))} ${badge}</span>` : `${esc(skillLabel(k))} ${badge}`;
+  }).join('');
   if (!res.length) {
-    $('summary').innerHTML = `<div class="skillname">${esc(sName)} ${affHtml}</div><p>${t.none}</p>`;
+    $('summary').innerHTML = `<div class="skillname">${affHtml}</div><p>${t.none}</p>`;
     $('locs').innerHTML = '';
     $('types').innerHTML = ''; $('weps').innerHTML = '';
     $('h-detail').textContent = t.detail; $('e-detail').textContent = '';
@@ -489,7 +496,7 @@ function renderResults() {
   }
   if (!st.sel || !res.some(r => r.g === st.sel)) st.sel = res[0].g;
   const top = res[0], bt = bestType(top);
-  $('summary').innerHTML = `<div class="skillname">${esc(sName)} ${affHtml}</div><p>${t.best(esc(sName), esc(locLabel(top.g)) + (top.g.var ? ` <span class="tag">${varTag(top.g.var)}</span>` : ''), pct(top.any, 1), bt ? esc(nm(D.types[bt.ty])) : '', bt ? pct(bt.cond, 1) : '')}</p>`;
+  $('summary').innerHTML = `<div class="skillname">${affHtml}</div><p>${t.best(esc(sName), esc(locLabel(top.g)) + (top.g.var ? ` <span class="tag">${varTag(top.g.var)}</span>` : ''), pct(top.any, 1), bt ? esc(nm(D.types[bt.ty])) : '', bt ? pct(bt.cond, 1) : '')}</p>`;
   const max = top.any;
   $('locs').innerHTML = res.slice(0, 30).map((r, i) => {
     const g = r.g;
@@ -546,9 +553,10 @@ $('q').addEventListener('input', renderSkills);
 $('skilllist').addEventListener('click', e => {
   const b = e.target.closest('[data-skill]');
   if (!b) return;
-  st.skill = b.dataset.skill; st.sel = null;
-  document.querySelectorAll('.chip[aria-pressed="true"]').forEach(x => x.setAttribute('aria-pressed', 'false'));
-  b.setAttribute('aria-pressed', 'true');
+  const key = b.dataset.skill;
+  st.skills.has(key) ? st.skills.delete(key) : st.skills.add(key);
+  st.sel = null;
+  b.setAttribute('aria-pressed', String(st.skills.has(key)));
   refresh();
 });
 $('cls').addEventListener('change', e => { st.cls = e.target.value; refresh(); });
