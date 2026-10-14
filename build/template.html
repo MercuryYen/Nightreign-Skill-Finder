@@ -1,0 +1,558 @@
+<title>Nightreign Skill Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a control strip over a two-pane board, ranked locations on the left, the chosen location's weapon breakdown on the right; stacks to one column on phones. */
+:root {
+  --bg: #eef0f4;
+  --panel: #ffffff;
+  --ink: #1b2030;
+  --muted: #5b6275;
+  --line: #d6dae3;
+  --accent: #9a6a1c;
+  --accent-soft: #f3e7cf;
+  --bar: #c99a45;
+  --bar-track: #e6e9ef;
+  --focus: #3b5bdb;
+  --a-std: #6f7686; --a-fire: #d0541f; --a-lightning: #c99a00; --a-holy: #b08a3e;
+  --a-magic: #3f63d6; --a-frost: #2a93b4; --a-poison: #4e8a2e; --a-blood: #b3243a;
+  --a-madness: #d88a12; --a-rot: #9b4a2a; --a-sleep: #7a5bc4;
+  --r0: #7b8090; --r1: #3a77c9; --r2: #8a4fc4; --r3: #c49a2a;
+  --display: "Marcellus SC", "Noto Serif TC", Georgia, serif;
+  --body: "Noto Sans TC", "Noto Sans JP", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1220; --panel: #171b2c; --ink: #e6e3d8; --muted: #9aa0b4; --line: #2a3047;
+    --accent: #e0b867; --accent-soft: #33291a; --bar: #d4a64f; --bar-track: #242a40; --focus: #8fa8ff;
+    --a-std: #9aa1b3; --a-fire: #f07a45; --a-lightning: #f0cc3a; --a-holy: #e3c47e;
+    --a-magic: #7f9cff; --a-frost: #5cc6e4; --a-poison: #84c35c; --a-blood: #ef5a70;
+    --a-madness: #f5a623; --a-rot: #d07a54; --a-sleep: #ad8ff0;
+    --r0: #a2a7b6; --r1: #6aa6f2; --r2: #b989f0; --r3: #e6c25a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1220; --panel: #171b2c; --ink: #e6e3d8; --muted: #9aa0b4; --line: #2a3047;
+  --accent: #e0b867; --accent-soft: #33291a; --bar: #d4a64f; --bar-track: #242a40; --focus: #8fa8ff;
+  --a-std: #9aa1b3; --a-fire: #f07a45; --a-lightning: #f0cc3a; --a-holy: #e3c47e;
+  --a-magic: #7f9cff; --a-frost: #5cc6e4; --a-poison: #84c35c; --a-blood: #ef5a70;
+  --a-madness: #f5a623; --a-rot: #d07a54; --a-sleep: #ad8ff0;
+  --r0: #a2a7b6; --r1: #6aa6f2; --r2: #b989f0; --r3: #e6c25a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; }
+html[lang="ja"] body { font-family: "Noto Sans JP", "Noto Sans TC", system-ui, sans-serif; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: grid; gap: 18px; }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(1.6rem, 3.6vw, 2.3rem); letter-spacing: .04em; margin: 0; line-height: 1.1; text-wrap: balance; }
+h1 small { display: block; font-family: var(--body); font-size: .9rem; letter-spacing: .02em; color: var(--muted); margin-top: 6px; font-weight: 500; }
+h2 { font-size: 1rem; margin: 0; font-weight: 700; letter-spacing: .02em; }
+.eyebrow { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--panel); }
+.seg button { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: .85rem; padding: 5px 14px; border-radius: 999px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--panel); font-weight: 700; }
+button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.controls { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 14px 18px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field label, .field .lbl { font-size: .78rem; color: var(--muted); font-weight: 500; letter-spacing: .04em; }
+input[type="search"], select { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0; }
+.filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; }
+.checks { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .88rem; }
+.checks label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: var(--ink); font-size: .88rem; letter-spacing: 0; }
+.skilllist { max-height: 228px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); padding: 6px; display: grid; gap: 8px; }
+.sgroup { display: grid; gap: 4px; }
+.sgroup .eyebrow { padding: 2px 4px; display: flex; align-items: center; gap: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: .84rem; padding: 3px 9px; border-radius: 6px; cursor: pointer; }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 700; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; background: var(--a-std); }
+
+.summary { border-left: 4px solid var(--accent); background: var(--panel); border-radius: 0 10px 10px 0; padding: 14px 16px; display: grid; gap: 6px; }
+.summary .skillname { font-size: 1.35rem; font-weight: 700; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.summary p { margin: 0; max-width: 75ch; }
+.aff { font-size: .75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
+.big { font-family: var(--mono); font-weight: 500; }
+
+.board { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 18px; align-items: start; }
+.pane { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+.pane-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.hint { font-size: .8rem; color: var(--muted); margin: 0; }
+ol.locs { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.loc { display: grid; grid-template-columns: 1.6em minmax(0, 1fr) 4.2em; gap: 4px 10px; align-items: center; padding: 8px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; }
+.loc:hover { background: var(--bg); }
+.loc[aria-selected="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.loc .rank { font-family: var(--mono); color: var(--muted); font-size: .8rem; text-align: right; }
+.loc .name { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; min-width: 0; }
+.loc .name span.t { overflow-wrap: anywhere; }
+.tag { font-size: .68rem; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; white-space: nowrap; }
+.loc .pct { font-family: var(--mono); text-align: right; font-weight: 500; font-variant-numeric: tabular-nums; }
+.loc .barline { grid-column: 2 / 4; height: 5px; background: var(--bar-track); border-radius: 3px; overflow: hidden; }
+.loc .barline i { display: block; height: 100%; background: var(--bar); border-radius: 3px; }
+.loc .sub { grid-column: 2 / 4; font-size: .76rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: .74rem; color: var(--muted); font-weight: 500; letter-spacing: .04em; white-space: nowrap; }
+td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.best td { background: var(--accent-soft); }
+.minibar { display: inline-block; vertical-align: middle; width: 56px; height: 5px; background: var(--bar-track); border-radius: 3px; overflow: hidden; margin-left: 6px; }
+.minibar i { display: block; height: 100%; background: var(--bar); }
+.rar { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.empty { color: var(--muted); padding: 18px 4px; }
+details.notes { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
+details.notes summary { cursor: pointer; font-weight: 700; }
+details.notes ul { margin: 10px 0 0; padding-left: 1.2em; display: grid; gap: 6px; max-width: 80ch; font-size: .9rem; color: var(--muted); }
+.busy { opacity: .55; transition: opacity .15s; }
+@media (max-width: 860px) {
+  .controls, .board { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 420px) { .filters { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1 id="title">Nightreign Skill Finder<small id="subtitle"></small></h1>
+    <div class="seg" role="group" aria-label="Language">
+      <button type="button" data-lang="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang="ja" aria-pressed="false">日本語</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <section class="controls" aria-label="Filters">
+    <div class="field">
+      <label for="q" id="l-skill"></label>
+      <input type="search" id="q" autocomplete="off">
+      <div class="skilllist" id="skilllist" role="listbox" aria-labelledby="l-skill"></div>
+    </div>
+    <div class="filters">
+      <div class="field">
+        <label for="cls" id="l-cls"></label>
+        <select id="cls"></select>
+      </div>
+      <div class="field">
+        <label for="map" id="l-map"></label>
+        <select id="map"></select>
+      </div>
+      <div class="field" style="grid-column: 1 / -1">
+        <span class="lbl" id="l-var"></span>
+        <div class="checks">
+          <label><input type="checkbox" id="v-base" checked> <span id="t-v-base"></span></label>
+          <label><input type="checkbox" id="v-v"> <span id="t-v-v"></span></label>
+          <label><input type="checkbox" id="v-c"> <span id="t-v-c"></span></label>
+          <label><input type="checkbox" id="v-x"> <span id="t-v-x"></span></label>
+        </div>
+      </div>
+      <div class="field" style="grid-column: 1 / -1">
+        <span class="lbl" id="l-kind"></span>
+        <div class="checks">
+          <label><input type="checkbox" id="k-site" checked> <span id="t-k-site"></span></label>
+          <label><input type="checkbox" id="k-other" checked> <span id="t-k-other"></span></label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="summary" id="summary" aria-live="polite"></section>
+
+  <section class="board">
+    <div class="pane">
+      <div class="pane-head"><h2 id="h-locs"></h2><span class="eyebrow" id="e-locs"></span></div>
+      <p class="hint" id="hint-locs"></p>
+      <ol class="locs" id="locs"></ol>
+    </div>
+    <div class="pane" id="detail">
+      <div class="pane-head"><h2 id="h-detail"></h2><span class="eyebrow" id="e-detail"></span></div>
+      <p class="hint" id="hint-types"></p>
+      <div class="tablewrap"><table id="types"></table></div>
+      <h2 id="h-weps" style="margin-top:8px"></h2>
+      <p class="hint" id="hint-weps"></p>
+      <div class="tablewrap"><table id="weps"></table></div>
+    </div>
+  </section>
+
+  <details class="notes">
+    <summary id="n-title"></summary>
+    <ul id="n-list"></ul>
+  </details>
+</div>
+
+<script type="application/json" id="data">/*__DATA__*/</script>
+<script>
+(function () {
+'use strict';
+const D = JSON.parse(document.getElementById('data').textContent);
+
+const T = {
+  zh: {
+    title: '黑夜君臨 戰技尋獲表', sub: '選一個戰技，找出最容易拿到它的地點與武器種',
+    skill: '戰技', search: '搜尋戰技名稱…', cls: '易發現的武器種（影響「職業武器」獎勵欄位）', avg: '角色預設・10 名平均', grpHero: '角色預設', grpType: '指定武器種（深夜模式）',
+    map: '地圖', mapAll: '全部地圖', limveld: '一般地圖', hollow: '大空洞（DLC）',
+    vars: '版本', vbase: '一般', vv: 'Variant 變體', vc: 'Condemned', vx: 'Cataclysm 劇變',
+    kinds: '來源', ksite: '有屬性標記的據點（營地・遺跡・大教堂…）', kother: '其他頭目（野外・城・封牢・地變…）',
+    locs: '推薦地點', locsE: '擊敗頭目 → 獎勵選項', hintLocs: '百分比 = 擊敗該頭目後，獎勵選項中至少出現一把帶此戰技的武器的機率。',
+    sub1: '每個選項', detail: '武器種分析', hintTypes: '「條件機率」= 在這裡掉出該武器種時，戰技是這一個的機率。「占比」= 此戰技的武器中有多少是該武器種。',
+    type: '武器種', cond: '條件機率', share: '占比', perDrop: '每次掉落',
+    weps: '個別武器偏差', hintWeps: '同一武器種內，個別武器（例如稀有武器）可能有自己的戰技池或固定戰技，機率會和武器種平均不同。',
+    wep: '武器', rarity: '稀有度', rar: ['普通', '精良', '稀有', '傳說'],
+    none: '目前的篩選條件下，沒有來源能掉出這個戰技。可以試著加入其他版本或來源。',
+    best: (s, loc, p, t, c) => `最容易取得「${s}」的地點是 <b>${loc}</b>：擊敗頭目後，獎勵選項中至少出現一次的機率約 <span class="big">${p}</span>。` + (t ? `在這裡最划算的武器種是 <b>${t}</b>（掉出該武器種時 <span class="big">${c}</span> 是此戰技）。` : ''),
+    unique: '專屬戰技', affName: { std: '普通', fire: '火', lightning: '雷', holy: '聖', magic: '魔力', frost: '寒氣', poison: '毒', blood: '出血' },
+    nTitle: '計算方式與注意事項',
+    notes: [
+      '資料來源：遊戲本體資料（2026-04-01 版）。',
+      '武器的屬性由據點決定：例如雷屬性遺跡的頭目約 75% 抽「雷」的武器表、25% 抽普通屬性的表；而戰技是從「該武器 × 該屬性」的戰技表等權重抽出，所以戰技池越小的武器種，抽中目標戰技的機率越高。',
+      '有些個別武器有自己的戰技表或固定戰技（例如部分稀有武器、Occult 表只會出白影誘惑），這些已逐一計入，不是用武器種平均估算。',
+      '頭目的每一列掉落視為一個獎勵選項，「至少出現一次」= 1 − Π(1 − 各選項機率)。寶箱與一般敵人掉落未列入。',
+      '「職業武器」獎勵欄位只會出「易發現的武器種」。平常是角色預設（追蹤者→大劍、女爵→短劍…）；深夜模式可以自己指定，指定後這一欄必定是該武器種，整體機率會跟著改變（例如指定重刺劍時，王朝劍技的機率會大幅提高）。「10 名平均」是把 10 名角色的預設等權平均。',
+      'Variant / Condemned / Cataclysm 為遊戲資料內的版本標記（較強或特殊狀態的同一頭目），預設只顯示一般版本。'
+    ]
+  },
+  ja: {
+    title: 'ナイトレイン 戦技ファインダー', sub: '戦技を選ぶと、入手しやすい場所と武器種を表示します',
+    skill: '戦技', search: '戦技名で検索…', cls: '見つけやすい武器種（「キャラ武器」報酬枠に影響）', avg: 'キャラ既定・10キャラ平均', grpHero: 'キャラ既定', grpType: '武器種を指定（深き夜）',
+    map: 'マップ', mapAll: 'すべて', limveld: '通常マップ', hollow: '大空洞（DLC）',
+    vars: 'バージョン', vbase: '通常', vv: 'Variant 変異', vc: 'Condemned', vx: 'Cataclysm 大変動',
+    kinds: '入手元', ksite: '属性マークのある拠点（野営地・遺跡・大教会…）', kother: 'その他のボス（フィールド・城・封牢・地変…）',
+    locs: 'おすすめの場所', locsE: 'ボス撃破 → 報酬の選択肢', hintLocs: '％＝ボス撃破後の報酬の選択肢に、この戦技の武器が少なくとも1つ出る確率。',
+    sub1: '各選択肢', detail: '武器種の内訳', hintTypes: '「条件付き確率」＝ここでその武器種が出たとき、戦技がこれになる確率。「割合」＝この戦技の武器のうち、その武器種が占める割合。',
+    type: '武器種', cond: '条件付き確率', share: '割合', perDrop: '1回あたり',
+    weps: '個別武器の偏り', hintWeps: '同じ武器種でも、個別の武器（レア武器など）は独自の戦技表や固定戦技を持つことがあり、確率が武器種の平均と異なります。',
+    wep: '武器', rarity: 'レア度', rar: ['コモン', 'アンコモン', 'レア', 'レジェンド'],
+    none: '現在の条件では、この戦技を落とす入手元がありません。バージョンや入手元を追加してみてください。',
+    best: (s, loc, p, t, c) => `「${s}」が最も出やすいのは <b>${loc}</b>：ボス撃破後の選択肢に少なくとも1回出る確率は約 <span class="big">${p}</span>。` + (t ? `ここで狙い目の武器種は <b>${t}</b>（この武器種が出たとき <span class="big">${c}</span> がこの戦技）。` : ''),
+    unique: '専用戦技', affName: { std: '標準', fire: '炎', lightning: '雷', holy: '聖', magic: '魔力', frost: '冷気', poison: '毒', blood: '出血' },
+    nTitle: '計算方法と注意点',
+    notes: [
+      'データ出典：ゲーム本体のデータ（2026-04-01 版）。',
+      '武器の属性は拠点で決まります。例：雷属性の遺跡のボスは約75%で「雷」の武器表、25%で標準属性の表を引きます。戦技は「その武器×その属性」の戦技表から等確率で抽選されるため、戦技プールが小さい武器種ほど目的の戦技が出やすくなります。',
+      '一部の武器は独自の戦技表や固定戦技を持ちます（一部のレア武器、Occult 表は白い影の誘いのみ など）。これらは武器ごとに計算済みです。',
+      'ボスのドロップ各行を報酬の選択肢1つとみなし、「少なくとも1回」＝ 1 − Π(1 − 各選択肢の確率) で計算しています。宝箱や雑魚敵のドロップは含みません。',
+      '「キャラ武器」報酬枠からは「見つけやすい武器種」だけが出ます。通常はキャラ既定（追跡者→大剣、レディ→短剣 など）、深き夜では自分で指定でき、その武器種が必ず出るため全体の確率が変わります（例：重刺剣を指定すると王朝剣技の確率が大きく上がる）。「10キャラ平均」は各キャラ既定の等重み平均です。',
+      'Variant / Condemned / Cataclysm はゲームデータ上のバージョン表記（強化版や特殊状態のボス）です。初期表示は通常版のみ。'
+    ]
+  },
+  en: {
+    title: 'Nightreign Skill Finder', sub: 'Pick a skill to see where and on which weapon types it drops most often',
+    skill: 'Skill', search: 'Search skills…', cls: 'Favoured weapon type (class-weapon reward slot)', avg: 'Hero default, average of 10', grpHero: 'Hero default', grpType: 'Chosen type (Deep of Night)',
+    map: 'Map', mapAll: 'All maps', limveld: 'Limveld', hollow: 'Great Hollow (DLC)',
+    vars: 'Version', vbase: 'Normal', vv: 'Variant', vc: 'Condemned', vx: 'Cataclysm',
+    kinds: 'Sources', ksite: 'Affinity-marked sites (encampments, ruins, churches…)', kother: 'Other bosses (field, castle, evergaol, shifting earth…)',
+    locs: 'Best places', locsE: 'Boss kill → reward choices', hintLocs: 'Percent = chance that at least one reward choice after the boss is a weapon with this skill.',
+    sub1: 'per choice', detail: 'Weapon types', hintTypes: '"Conditional" = if this weapon type drops here, the chance it carries this skill. "Share" = how many of this skill\'s drops are this type.',
+    type: 'Weapon type', cond: 'Conditional', share: 'Share', perDrop: 'per drop',
+    weps: 'Individual weapon bias', hintWeps: 'Inside one weapon type, some weapons (often rares) have their own skill table or a fixed skill, so their odds differ from the type average.',
+    wep: 'Weapon', rarity: 'Rarity', rar: ['Common', 'Uncommon', 'Rare', 'Legendary'],
+    none: 'No source drops this skill with the current filters. Try adding other versions or sources.',
+    best: (s, loc, p, t, c) => `${s} is easiest to get at <b>${loc}</b>: about <span class="big">${p}</span> chance that at least one boss reward choice has it.` + (t ? ` The best weapon type there is <b>${t}</b> (<span class="big">${c}</span> of those drops roll this skill).` : ''),
+    unique: 'Unique skills', affName: { std: 'Standard', fire: 'Fire', lightning: 'Lightning', holy: 'Holy', magic: 'Magic', frost: 'Frost', poison: 'Poison', blood: 'Blood' },
+    nTitle: 'How this is calculated',
+    notes: [
+      'Source: the game\'s own data (2026-04-01 version).',
+      'The site sets the weapon\'s affinity. A Lightning Ruins boss, for example, rolls the Lightning weapon table about 75% of the time and the Standard table 25%. The skill is then drawn evenly from that weapon × affinity skill table, so weapon types with smaller skill pools hit a given skill more often.',
+      'Some individual weapons have their own skill table or a fixed skill (some rares; the Occult table only rolls White Shadow\'s Lure). These are counted weapon by weapon, not averaged by type.',
+      'Each drop row of a boss counts as one reward choice; "at least once" = 1 − Π(1 − p of each choice). Chests and regular enemies are not included.',
+      'The class-weapon reward slot only rolls the favoured weapon type. Normally that is the hero default (Wylder → greatswords, Duchess → daggers…); in Deep of Night you can pick it yourself, and the slot then always gives that type, which shifts the overall odds (picking heavy thrusting swords makes Dynast\'s Finesse much more likely). "Average of 10" weights each hero default equally.',
+      'Variant / Condemned / Cataclysm are version tags in the game data (stronger or special states of the same boss). Only the normal version is shown by default.'
+    ]
+  }
+};
+const DISC_TYPES = [1, 3, 5, 7, 9, 11, 13, 14, 15, 16, 17, 19, 21, 23, 24, 25, 28, 29, 31, 35, 37, 39, 41, 51, 53, 55, 56, 57, 61, 65, 67, 69, 87];
+// each hero's default favoured types (the class rows of the For Class tables)
+const HERO_TYPE = { 1: [5], 2: [29], 3: [51], 4: [1], 5: [23, 19, 41], 6: [61], 7: [57], 8: [13], 9: [15], 10: [21] };
+const AFF_ORDER = ['lightning', 'fire', 'holy', 'magic', 'frost', 'poison', 'blood', 'std'];
+const SITE_KINDS = new Set(['camp', 'ruins', 'church', 'fort', 'marsh', 'village', 'ufort']);
+
+let lang = 'zh';
+try { const s = localStorage.getItem('nr-lang'); if (s && T[s]) lang = s; } catch (e) {}
+// merge skills that share a name; a skill is "common" if it appears in any multi-entry skill table
+const pooled = new Set();
+for (const t of Object.values(D.sats)) if (t.length > 1) for (const x of t) pooled.add(x[0]);
+const SK = new Map();
+for (const [id, s] of Object.entries(D.skills)) {
+  if (!s.n.en || s.n.en === '%null%') continue;
+  const key = s.n.en;
+  if (!SK.has(key)) SK.set(key, { key, n: s.n, ids: new Set(), a: s.a, u: true });
+  const e = SK.get(key);
+  e.ids.add(+id);
+  if (pooled.has(+id)) { e.u = false; e.a = s.a; }
+}
+const st = { skill: 'Thunderbolt', cls: 'avg', map: 'all', vars: new Set(['']), site: true, other: true, sel: null };
+
+const nm = o => (o && (o[lang] || o.en)) || '';
+const pct = (p, d) => (p * 100).toFixed(d == null ? (p >= 0.1 ? 1 : p >= 0.01 ? 2 : 3) : d) + '%';
+const affColor = a => `var(--a-${a || 'std'})`;
+
+// ---------- probability engine ----------
+const tmemo = new Map();
+// mode: 'avg' | 'c<hero>' (hero's default favoured type) | 't<wepType>' (favoured type chosen in Deep of Night)
+function parseMode(m) {
+  if (m[0] === 'c') { const c = +m.slice(1); return [c, 1000 + 100 * c]; }
+  return [0, +m.slice(1)];
+}
+function tdist(t, mode, depth) {
+  const key = t + '|' + mode;
+  if (tmemo.has(key)) return tmemo.get(key);
+  const out = new Map();
+  tmemo.set(key, out);
+  const [cls, disc] = parseMode(mode);
+  const rows = (D.tables[t] || []).filter(r => (r[3] === 0 || r[3] === cls) && (r[4] === -1 || r[4] === disc));
+  let tot = 0;
+  for (const r of rows) tot += r[2];
+  if (tot > 0 && (depth || 0) < 24) {
+    for (const r of rows) {
+      const p = r[2] / tot;
+      if (r[0] === 7) for (const [k, v] of tdist(r[1], mode, (depth || 0) + 1)) out.set(k, (out.get(k) || 0) + p * v);
+      else if (r[0] === 6 || r[0] === 2) { const k = (r[0] === 6 ? 'c' : 'w') + r[1]; out.set(k, (out.get(k) || 0) + p); }
+    }
+  }
+  return out;
+}
+const lmemo = new Map();
+function lotLeaves(lot, cls) {
+  const key = lot + '|' + cls;
+  if (lmemo.has(key)) return lmemo.get(key);
+  let out = new Map();
+  if (cls === 'avg') {
+    for (let c = 1; c <= 10; c++) for (const [k, v] of lotLeaves(lot, 'c' + c)) out.set(k, (out.get(k) || 0) + v / 10);
+  } else {
+    const slots = D.lots[lot] || [];
+    let tot = 0;
+    for (const s of slots) tot += s[2];
+    for (const s of slots) {
+      const p = s[2] / tot;
+      if (s[0] === 7) for (const [k, v] of tdist(s[1], cls, 0)) out.set(k, (out.get(k) || 0) + p * v);
+      else if (s[0] === 6 || s[0] === 2) { const k = (s[0] === 6 ? 'c' : 'w') + s[1]; out.set(k, (out.get(k) || 0) + p); }
+    }
+  }
+  lmemo.set(key, out);
+  return out;
+}
+const smemo = new Map();
+function leafInfo(k) {
+  if (smemo.has(k)) return smemo.get(k);
+  let wep, skills = [];
+  if (k[0] === 'c') {
+    const cw = D.cws[k.slice(1)];
+    if (cw) {
+      wep = cw[0];
+      const sat = cw[1] > 0 && D.sats[cw[1]];
+      if (sat && sat.length) {
+        let tot = 0; for (const x of sat) tot += x[1];
+        skills = sat.map(x => [x[0], x[1] / tot]);
+      }
+    }
+  } else wep = +k.slice(1);
+  const w = wep != null && D.weps[wep];
+  if (w && !skills.length) skills = [[w[1], 1]];
+  const info = w ? { wep, type: w[0], skills } : null;
+  smemo.set(k, info);
+  return info;
+}
+function analyse(skill) {
+  const ids = SK.get(skill).ids;
+  const res = [];
+  for (const g of D.groups) {
+    if (!st.vars.has(g.var)) continue;
+    if (st.map !== 'all' && g.map !== st.map) continue;
+    const site = SITE_KINDS.has(g.kind) && g.aff;
+    if (site ? !st.site : !st.other) continue;
+    let miss = 1, rows = [];
+    const typeSkill = new Map(), typeAll = new Map(), wepSkill = new Map(), wepAll = new Map();
+    for (const lot of g.lots) {
+      let p = 0;
+      for (const [k, v] of lotLeaves(lot, st.cls)) {
+        const info = leafInfo(k);
+        if (!info) continue;
+        typeAll.set(info.type, (typeAll.get(info.type) || 0) + v);
+        wepAll.set(info.wep, (wepAll.get(info.wep) || 0) + v);
+        for (const [s, ps] of info.skills) if (ids.has(s)) {
+          const q = v * ps;
+          p += q;
+          typeSkill.set(info.type, (typeSkill.get(info.type) || 0) + q);
+          wepSkill.set(info.wep, (wepSkill.get(info.wep) || 0) + q);
+        }
+      }
+      rows.push(p);
+      miss *= 1 - Math.min(1, p);
+    }
+    const any = 1 - miss;
+    if (any > 1e-6) res.push({ g, any, rows, typeSkill, typeAll, wepSkill, wepAll });
+  }
+  res.sort((a, b) => b.any - a.any);
+  return res;
+}
+
+// ---------- rendering ----------
+const $ = id => document.getElementById(id);
+function skillLabel(key) { const s = SK.get(key); return s ? nm(s.n) : key; }
+function varTag(v) { const t = T[lang]; return v === 'v' ? t.vv : v === 'c' ? t.vc : v === 'x' ? t.vx : ''; }
+
+function renderStatic() {
+  const t = T[lang];
+  document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : lang;
+  $('title').firstChild.nodeValue = t.title;
+  $('subtitle').textContent = t.sub;
+  $('l-skill').textContent = t.skill;
+  $('q').placeholder = t.search;
+  $('l-cls').textContent = t.cls;
+  $('l-map').textContent = t.map;
+  $('l-var').textContent = t.vars;
+  $('t-v-base').textContent = t.vbase; $('t-v-v').textContent = t.vv; $('t-v-c').textContent = t.vc; $('t-v-x').textContent = t.vx;
+  $('l-kind').textContent = t.kinds; $('t-k-site').textContent = t.ksite; $('t-k-other').textContent = t.kother;
+  $('h-locs').textContent = t.locs; $('e-locs').textContent = t.locsE; $('hint-locs').textContent = t.hintLocs;
+  $('h-weps').textContent = t.weps; $('hint-weps').textContent = t.hintWeps; $('hint-types').textContent = t.hintTypes;
+  $('n-title').textContent = t.nTitle;
+  $('n-list').innerHTML = t.notes.map(n => `<li>${n}</li>`).join('');
+  const cls = $('cls');
+  const tyName = c => c === 51 && D.types[50] ? nm(D.types[50]) + '・' + nm(D.types[51]) : nm(D.types[c]);
+  cls.innerHTML = `<optgroup label="${t.grpHero}"><option value="avg">${t.avg}</option>` +
+    Object.keys(D.classes).map(c => `<option value="c${c}">${nm(D.classes[c])}（${HERO_TYPE[c].map(tyName).join('・')}）</option>`).join('') +
+    `</optgroup><optgroup label="${t.grpType}">` + DISC_TYPES.filter(c => D.types[c]).map(c => `<option value="t${c}">${tyName(c)}</option>`).join('') + '</optgroup>';
+  cls.value = String(st.cls);
+  $('map').innerHTML = [['all', t.mapAll], ['limveld', t.limveld], ['hollow', t.hollow]].map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  $('map').value = st.map;
+  document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+  renderSkills();
+}
+
+function renderSkills() {
+  const t = T[lang];
+  const q = $('q').value.trim().toLowerCase();
+  const groups = new Map();
+  for (const s of SK.values()) {
+    const n = nm(s.n);
+    if (q && ![s.n.zh, s.n.ja, s.n.en].some(x => x && x.toLowerCase().includes(q))) continue;
+    const key = s.u ? 'unique' : s.a;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push([s.key, n]);
+  }
+  const order = [...AFF_ORDER, 'unique'];
+  let html = '';
+  for (const key of order) {
+    const list = groups.get(key);
+    if (!list) continue;
+    list.sort((a, b) => a[1].localeCompare(b[1], lang === 'en' ? 'en' : lang === 'ja' ? 'ja' : 'zh-Hant'));
+    const label = key === 'unique' ? t.unique : t.affName[key];
+    const col = key === 'unique' ? 'var(--accent)' : affColor(key);
+    html += `<div class="sgroup"><div class="eyebrow"><span class="dot" style="background:${col}"></span>${label}</div><div class="chips">` +
+      list.map(([id, n]) => `<button type="button" class="chip" data-skill="${esc(id)}" aria-pressed="${id === st.skill}">${esc(n)}</button>`).join('') + '</div></div>';
+  }
+  $('skilllist').innerHTML = html || `<div class="empty">—</div>`;
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+function locLabel(g) { return nm(g.label); }
+
+function bestType(r) {
+  let best = null;
+  for (const [ty, ps] of r.typeSkill) {
+    const all = r.typeAll.get(ty) || 0;
+    if (!all) continue;
+    const cond = ps / all;
+    if (ps / r.rows.reduce((a, b) => a + b, 0) < 0.03) continue;
+    if (!best || cond > best.cond) best = { ty, cond };
+  }
+  return best;
+}
+
+let lastRes = [];
+function renderResults() {
+  const t = T[lang];
+  const res = analyse(st.skill);
+  lastRes = res;
+  const s = SK.get(st.skill);
+  const sName = skillLabel(st.skill);
+  const affKey = s && !s.u ? s.a : null;
+  const affHtml = affKey ? `<span class="aff" style="color:${affColor(affKey)}">${t.affName[affKey]}</span>` : `<span class="aff" style="color:var(--accent)">${t.unique}</span>`;
+  if (!res.length) {
+    $('summary').innerHTML = `<div class="skillname">${esc(sName)} ${affHtml}</div><p>${t.none}</p>`;
+    $('locs').innerHTML = '';
+    $('types').innerHTML = ''; $('weps').innerHTML = '';
+    $('h-detail').textContent = t.detail; $('e-detail').textContent = '';
+    return;
+  }
+  if (!st.sel || !res.some(r => r.g === st.sel)) st.sel = res[0].g;
+  const top = res[0], bt = bestType(top);
+  $('summary').innerHTML = `<div class="skillname">${esc(sName)} ${affHtml}</div><p>${t.best(esc(sName), esc(locLabel(top.g)) + (top.g.var ? ` <span class="tag">${varTag(top.g.var)}</span>` : ''), pct(top.any, 1), bt ? esc(nm(D.types[bt.ty])) : '', bt ? pct(bt.cond, 1) : '')}</p>`;
+  const max = top.any;
+  $('locs').innerHTML = res.slice(0, 30).map((r, i) => {
+    const g = r.g;
+    const tags = [g.map === 'hollow' ? t.hollow : '', varTag(g.var)].filter(Boolean).map(x => `<span class="tag">${x}</span>`).join('');
+    return `<li class="loc" role="option" tabindex="0" data-i="${i}" aria-selected="${g === st.sel}">
+      <span class="rank">${i + 1}</span>
+      <span class="name"><span class="dot" style="background:${g.aff ? affColor(g.aff === 'madness' || g.aff === 'rot' || g.aff === 'sleep' ? g.aff : g.aff) : 'var(--line)'}"></span><span class="t">${esc(locLabel(g))}</span>${tags}</span>
+      <span class="pct">${pct(r.any, 1)}</span>
+      <span class="barline"><i style="width:${(r.any / max * 100).toFixed(1)}%"></i></span>
+      <span class="sub">${t.sub1}: ${r.rows.filter(p => p > 0).map(p => pct(p)).join(' · ')}</span>
+    </li>`;
+  }).join('');
+  renderDetail();
+}
+
+function renderDetail() {
+  const t = T[lang];
+  const r = lastRes.find(x => x.g === st.sel);
+  if (!r) return;
+  $('h-detail').textContent = `${t.detail}：${locLabel(r.g)}`;
+  $('e-detail').textContent = varTag(r.g.var);
+  const totalSkill = [...r.typeSkill.values()].reduce((a, b) => a + b, 0);
+  const types = [...r.typeSkill.entries()].map(([ty, ps]) => ({ ty, ps, cond: ps / (r.typeAll.get(ty) || 1), share: ps / totalSkill }))
+    .sort((a, b) => b.cond - a.cond);
+  const bt = bestType(r);
+  $('types').innerHTML = `<thead><tr><th>${t.type}</th><th class="num">${t.cond}</th><th class="num">${t.share}</th></tr></thead><tbody>` +
+    types.map(x => `<tr class="${bt && bt.ty === x.ty ? 'best' : ''}"><td>${esc(nm(D.types[x.ty]))}</td><td class="num">${pct(x.cond, 1)}<span class="minibar"><i style="width:${Math.min(100, x.cond * 100).toFixed(1)}%"></i></span></td><td class="num">${pct(x.share, 1)}</td></tr>`).join('') + '</tbody>';
+  // individual weapons whose conditional odds differ from their type average
+  const rows = [...r.wepSkill.entries()].map(([w, ps]) => {
+    const all = r.wepAll.get(w) || 1, ty = D.weps[w][0];
+    const typeCond = (r.typeSkill.get(ty) || 0) / (r.typeAll.get(ty) || 1);
+    return { w, ps, cond: ps / all, ty, typeCond, rar: D.weps[w][2] };
+  }).filter(x => x.ps / totalSkill > 0.002);
+  rows.sort((a, b) => Math.abs(b.cond - b.typeCond) - Math.abs(a.cond - a.typeCond) || b.cond - a.cond);
+  const shown = rows.slice(0, 12).sort((a, b) => b.cond - a.cond);
+  $('weps').innerHTML = shown.length ? `<thead><tr><th>${t.wep}</th><th>${t.type}</th><th class="num">${t.cond}</th><th class="num">${t.type}</th></tr></thead><tbody>` +
+    shown.map(x => `<tr><td><span class="rar" style="background:var(--r${Math.min(3, x.rar)})" title="${t.rar[Math.min(3, x.rar)]}"></span>${esc(nm(D.wnames[x.w]))}</td><td>${esc(nm(D.types[x.ty]))}</td><td class="num">${pct(x.cond, 1)}</td><td class="num">${pct(x.typeCond, 1)}</td></tr>`).join('') + '</tbody>' : '';
+}
+
+function refresh() {
+  document.querySelector('.board').classList.add('busy');
+  setTimeout(() => { renderResults(); document.querySelector('.board').classList.remove('busy'); }, 16);
+}
+
+// ---------- events ----------
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  lang = b.dataset.lang;
+  try { localStorage.setItem('nr-lang', lang); } catch (e) {}
+  renderStatic(); renderResults();
+}));
+$('q').addEventListener('input', renderSkills);
+$('skilllist').addEventListener('click', e => {
+  const b = e.target.closest('[data-skill]');
+  if (!b) return;
+  st.skill = b.dataset.skill; st.sel = null;
+  document.querySelectorAll('.chip[aria-pressed="true"]').forEach(x => x.setAttribute('aria-pressed', 'false'));
+  b.setAttribute('aria-pressed', 'true');
+  refresh();
+});
+$('cls').addEventListener('change', e => { st.cls = e.target.value; refresh(); });
+$('map').addEventListener('change', e => { st.map = e.target.value; refresh(); });
+[['v-base', ''], ['v-v', 'v'], ['v-c', 'c'], ['v-x', 'x']].forEach(([id, v]) => $(id).addEventListener('change', e => { e.target.checked ? st.vars.add(v) : st.vars.delete(v); refresh(); }));
+$('k-site').addEventListener('change', e => { st.site = e.target.checked; refresh(); });
+$('k-other').addEventListener('change', e => { st.other = e.target.checked; refresh(); });
+function pick(li) { const r = lastRes[+li.dataset.i]; if (!r) return; st.sel = r.g; document.querySelectorAll('.loc').forEach(x => x.setAttribute('aria-selected', String(x === li))); renderDetail(); }
+$('locs').addEventListener('click', e => { const li = e.target.closest('.loc'); if (li) pick(li); });
+$('locs').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const li = e.target.closest('.loc'); if (li) { e.preventDefault(); pick(li); } } });
+
+renderStatic();
+renderResults();
+})();
+</script>

@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# Extracted game data (not redistributed)
+work/
+*.dcx
+*.param
+*.bin
+fmg.json
+data*.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
