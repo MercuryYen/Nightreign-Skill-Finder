@@ -208,9 +208,9 @@ const T = {
     vars: '版本', vbase: '一般', vv: 'Variant 變體', vc: 'Condemned', vx: 'Cataclysm 劇變',
     kinds: '來源', ksite: '有屬性標記的據點（營地・遺跡・大教堂…）', kother: '其他頭目（野外・城・封牢・地變…）',
     locs: '推薦地點', locsE: '擊敗頭目 → 獎勵選項', hintLocs: '百分比 = 擊敗該頭目後，獎勵選項中至少出現一把帶此戰技的武器的機率。',
-    sub1: '每個選項', detail: '武器種分析', hintTypes: '「條件機率」= 在這裡掉出該武器種時，戰技是這一個的機率。「占比」= 此戰技的武器中有多少是該武器種。',
-    type: '武器種', cond: '條件機率', share: '占比', perDrop: '每次掉落',
-    weps: '個別武器偏差', hintWeps: '同一武器種內，個別武器（例如稀有武器）可能有自己的戰技池或固定戰技，機率會和武器種平均不同。',
+    sub1: '每個選項', detail: '武器種分析', hintTypes: '條件機率 = 在這裡掉出該武器種時，戰技是這一個的機率，依獎勵欄位分開計算。「一般欄位」是所有武器種混抽的欄位；「職業武器欄位」只會出「易發現的武器種」，戰技池可能不同。「占比」= 此戰技的武器中有多少是該武器種。',
+    type: '武器種', cond: '條件機率', share: '占比', perDrop: '每次掉落', slotG: '一般欄位', slotK: '職業武器欄位', typeAvg: '武器種平均',
+    weps: '個別武器偏差', hintWeps: '同一武器種內，個別武器（例如稀有武器）可能有自己的戰技池或固定戰技，機率會和武器種平均不同（以一般欄位計算）。',
     wep: '武器', rarity: '稀有度', rar: ['普通', '精良', '稀有', '傳說'],
     none: '目前的篩選條件下，沒有來源能掉出這個戰技。可以試著加入其他版本或來源。',
     best: (s, loc, p, t, c) => `最容易取得「${s}」的地點是 <b>${loc}</b>：擊敗頭目後，獎勵選項中至少出現一次的機率約 <span class="big">${p}</span>。` + (t ? `在這裡最划算的武器種是 <b>${t}</b>（掉出該武器種時 <span class="big">${c}</span> 是此戰技）。` : ''),
@@ -232,9 +232,9 @@ const T = {
     vars: 'バージョン', vbase: '通常', vv: 'Variant 変異', vc: 'Condemned', vx: 'Cataclysm 大変動',
     kinds: '入手元', ksite: '属性マークのある拠点（野営地・遺跡・大教会…）', kother: 'その他のボス（フィールド・城・封牢・地変…）',
     locs: 'おすすめの場所', locsE: 'ボス撃破 → 報酬の選択肢', hintLocs: '％＝ボス撃破後の報酬の選択肢に、この戦技の武器が少なくとも1つ出る確率。',
-    sub1: '各選択肢', detail: '武器種の内訳', hintTypes: '「条件付き確率」＝ここでその武器種が出たとき、戦技がこれになる確率。「割合」＝この戦技の武器のうち、その武器種が占める割合。',
-    type: '武器種', cond: '条件付き確率', share: '割合', perDrop: '1回あたり',
-    weps: '個別武器の偏り', hintWeps: '同じ武器種でも、個別の武器（レア武器など）は独自の戦技表や固定戦技を持つことがあり、確率が武器種の平均と異なります。',
+    sub1: '各選択肢', detail: '武器種の内訳', hintTypes: '条件付き確率＝ここでその武器種が出たとき、戦技がこれになる確率（報酬枠ごとに計算）。「通常の枠」は全武器種から抽選される枠、「キャラ武器枠」は「見つけやすい武器種」だけが出る枠で、戦技プールが異なる場合があります。「割合」＝この戦技の武器のうち、その武器種が占める割合。',
+    type: '武器種', cond: '条件付き確率', share: '割合', perDrop: '1回あたり', slotG: '通常の枠', slotK: 'キャラ武器枠', typeAvg: '武器種の平均',
+    weps: '個別武器の偏り', hintWeps: '同じ武器種でも、個別の武器（レア武器など）は独自の戦技表や固定戦技を持つことがあり、確率が武器種の平均と異なります（通常の枠で計算）。',
     wep: '武器', rarity: 'レア度', rar: ['コモン', 'アンコモン', 'レア', 'レジェンド'],
     none: '現在の条件では、この戦技を落とす入手元がありません。バージョンや入手元を追加してみてください。',
     best: (s, loc, p, t, c) => `「${s}」が最も出やすいのは <b>${loc}</b>：ボス撃破後の選択肢に少なくとも1回出る確率は約 <span class="big">${p}</span>。` + (t ? `ここで狙い目の武器種は <b>${t}</b>（この武器種が出たとき <span class="big">${c}</span> がこの戦技）。` : ''),
@@ -256,9 +256,9 @@ const T = {
     vars: 'Version', vbase: 'Normal', vv: 'Variant', vc: 'Condemned', vx: 'Cataclysm',
     kinds: 'Sources', ksite: 'Affinity-marked sites (encampments, ruins, churches…)', kother: 'Other bosses (field, castle, evergaol, shifting earth…)',
     locs: 'Best places', locsE: 'Boss kill → reward choices', hintLocs: 'Percent = chance that at least one reward choice after the boss is a weapon with this skill.',
-    sub1: 'per choice', detail: 'Weapon types', hintTypes: '"Conditional" = if this weapon type drops here, the chance it carries this skill. "Share" = how many of this skill\'s drops are this type.',
-    type: 'Weapon type', cond: 'Conditional', share: 'Share', perDrop: 'per drop',
-    weps: 'Individual weapon bias', hintWeps: 'Inside one weapon type, some weapons (often rares) have their own skill table or a fixed skill, so their odds differ from the type average.',
+    sub1: 'per choice', detail: 'Weapon types', hintTypes: 'Conditional = if this weapon type drops here, the chance it carries this skill, counted per reward slot. "General slots" roll every weapon type; the "class-weapon slot" only rolls the favoured weapon type and can have a different skill pool. "Share" = how many of this skill\'s drops are this type.',
+    type: 'Weapon type', cond: 'Conditional', share: 'Share', perDrop: 'per drop', slotG: 'General slots', slotK: 'Class-weapon slot', typeAvg: 'Type average',
+    weps: 'Individual weapon bias', hintWeps: 'Inside one weapon type, some weapons (often rares) have their own skill table or a fixed skill, so their odds differ from the type average (general slots).',
     wep: 'Weapon', rarity: 'Rarity', rar: ['Common', 'Uncommon', 'Rare', 'Legendary'],
     none: 'No source drops this skill with the current filters. Try adding other versions or sources.',
     best: (s, loc, p, t, c) => `${s} is easiest to get at <b>${loc}</b>: about <span class="big">${p}</span> chance that at least one boss reward choice has it.` + (t ? ` The best weapon type there is <b>${t}</b> (<span class="big">${c}</span> of those drops roll this skill).` : ''),
@@ -313,14 +313,16 @@ function tdist(t, mode, depth) {
   const out = new Map();
   tmemo.set(key, out);
   const [cls, disc] = parseMode(mode);
+  const isClass = (D.tables[t] || []).some(r => r[4] !== -1);
+  const tag = k => (isClass && k[0] !== 'K' ? 'K' + k : k);
   const rows = (D.tables[t] || []).filter(r => (r[3] === 0 || r[3] === cls) && (r[4] === -1 || r[4] === disc));
   let tot = 0;
   for (const r of rows) tot += r[2];
   if (tot > 0 && (depth || 0) < 24) {
     for (const r of rows) {
       const p = r[2] / tot;
-      if (r[0] === 7) for (const [k, v] of tdist(r[1], mode, (depth || 0) + 1)) out.set(k, (out.get(k) || 0) + p * v);
-      else if (r[0] === 6 || r[0] === 2) { const k = (r[0] === 6 ? 'c' : 'w') + r[1]; out.set(k, (out.get(k) || 0) + p); }
+      if (r[0] === 7) for (const [k0, v] of tdist(r[1], mode, (depth || 0) + 1)) { const k = tag(k0); out.set(k, (out.get(k) || 0) + p * v); }
+      else if (r[0] === 6 || r[0] === 2) { const k = tag((r[0] === 6 ? 'c' : 'w') + r[1]); out.set(k, (out.get(k) || 0) + p); }
     }
   }
   return out;
@@ -375,26 +377,30 @@ function analyse(skill) {
     const site = SITE_KINDS.has(g.kind) && g.aff;
     if (site ? !st.site : !st.other) continue;
     let miss = 1, rows = [];
-    const typeSkill = new Map(), typeAll = new Map(), wepSkill = new Map(), wepAll = new Map();
+    // G = general reward slots, K = class-weapon slot (favoured weapon type)
+    const typeSkill = new Map(), gSkill = new Map(), gAll = new Map(), kSkill = new Map(), kAll = new Map(), wepSkill = new Map(), wepAll = new Map();
+    const add = (m, key, v) => m.set(key, (m.get(key) || 0) + v);
     for (const lot of g.lots) {
       let p = 0;
       for (const [k, v] of lotLeaves(lot, st.cls)) {
-        const info = leafInfo(k);
+        const isK = k[0] === 'K';
+        const info = leafInfo(isK ? k.slice(1) : k);
         if (!info) continue;
-        typeAll.set(info.type, (typeAll.get(info.type) || 0) + v);
-        wepAll.set(info.wep, (wepAll.get(info.wep) || 0) + v);
+        add(isK ? kAll : gAll, info.type, v);
+        if (!isK) add(wepAll, info.wep, v);
         for (const [s, ps] of info.skills) if (ids.has(s)) {
           const q = v * ps;
           p += q;
-          typeSkill.set(info.type, (typeSkill.get(info.type) || 0) + q);
-          wepSkill.set(info.wep, (wepSkill.get(info.wep) || 0) + q);
+          add(typeSkill, info.type, q);
+          add(isK ? kSkill : gSkill, info.type, q);
+          if (!isK) add(wepSkill, info.wep, q);
         }
       }
       rows.push(p);
       miss *= 1 - Math.min(1, p);
     }
     const any = 1 - miss;
-    if (any > 1e-6) res.push({ g, any, rows, typeSkill, typeAll, wepSkill, wepAll });
+    if (any > 1e-6) res.push({ g, any, rows, typeSkill, gSkill, gAll, kSkill, kAll, wepSkill, wepAll });
   }
   res.sort((a, b) => b.any - a.any);
   return res;
@@ -463,8 +469,8 @@ function locLabel(g) { return nm(g.label); }
 
 function bestType(r) {
   let best = null;
-  for (const [ty, ps] of r.typeSkill) {
-    const all = r.typeAll.get(ty) || 0;
+  for (const [ty, ps] of r.gSkill) {
+    const all = r.gAll.get(ty) || 0;
     if (!all) continue;
     const cond = ps / all;
     if (ps / r.rows.reduce((a, b) => a + b, 0) < 0.03) continue;
@@ -514,20 +520,22 @@ function renderDetail() {
   $('h-detail').textContent = `${t.detail}：${locLabel(r.g)}`;
   $('e-detail').textContent = varTag(r.g.var);
   const totalSkill = [...r.typeSkill.values()].reduce((a, b) => a + b, 0);
-  const types = [...r.typeSkill.entries()].map(([ty, ps]) => ({ ty, ps, cond: ps / (r.typeAll.get(ty) || 1), share: ps / totalSkill }))
-    .sort((a, b) => b.cond - a.cond);
+  const cond = (m, a, ty) => (a.get(ty) ? (m.get(ty) || 0) / a.get(ty) : null);
+  const types = [...r.typeSkill.entries()].map(([ty, ps]) => ({ ty, ps, g: cond(r.gSkill, r.gAll, ty), k: cond(r.kSkill, r.kAll, ty), share: ps / totalSkill }))
+    .sort((a, b) => (b.g ?? -1) - (a.g ?? -1) || (b.k ?? -1) - (a.k ?? -1));
+  const cell = v => v == null ? '<td class="num">—</td>' : `<td class="num">${pct(v, 1)}<span class="minibar"><i style="width:${Math.min(100, v * 100).toFixed(1)}%"></i></span></td>`;
   const bt = bestType(r);
-  $('types').innerHTML = `<thead><tr><th>${t.type}</th><th class="num">${t.cond}</th><th class="num">${t.share}</th></tr></thead><tbody>` +
-    types.map(x => `<tr class="${bt && bt.ty === x.ty ? 'best' : ''}"><td>${esc(nm(D.types[x.ty]))}</td><td class="num">${pct(x.cond, 1)}<span class="minibar"><i style="width:${Math.min(100, x.cond * 100).toFixed(1)}%"></i></span></td><td class="num">${pct(x.share, 1)}</td></tr>`).join('') + '</tbody>';
+  $('types').innerHTML = `<thead><tr><th>${t.type}</th><th class="num">${t.slotG}</th><th class="num">${t.slotK}</th><th class="num">${t.share}</th></tr></thead><tbody>` +
+    types.map(x => `<tr class="${bt && bt.ty === x.ty ? 'best' : ''}"><td>${esc(nm(D.types[x.ty]))}</td>${cell(x.g)}${cell(x.k)}<td class="num">${pct(x.share, 1)}</td></tr>`).join('') + '</tbody>';
   // individual weapons whose conditional odds differ from their type average
   const rows = [...r.wepSkill.entries()].map(([w, ps]) => {
     const all = r.wepAll.get(w) || 1, ty = D.weps[w][0];
-    const typeCond = (r.typeSkill.get(ty) || 0) / (r.typeAll.get(ty) || 1);
+    const typeCond = (r.gSkill.get(ty) || 0) / (r.gAll.get(ty) || 1);
     return { w, ps, cond: ps / all, ty, typeCond, rar: D.weps[w][2] };
   }).filter(x => x.ps / totalSkill > 0.002);
   rows.sort((a, b) => Math.abs(b.cond - b.typeCond) - Math.abs(a.cond - a.typeCond) || b.cond - a.cond);
   const shown = rows.slice(0, 12).sort((a, b) => b.cond - a.cond);
-  $('weps').innerHTML = shown.length ? `<thead><tr><th>${t.wep}</th><th>${t.type}</th><th class="num">${t.cond}</th><th class="num">${t.type}</th></tr></thead><tbody>` +
+  $('weps').innerHTML = shown.length ? `<thead><tr><th>${t.wep}</th><th>${t.type}</th><th class="num">${t.cond}</th><th class="num">${t.typeAvg}</th></tr></thead><tbody>` +
     shown.map(x => `<tr><td><span class="rar" style="background:var(--r${Math.min(3, x.rar)})" title="${t.rar[Math.min(3, x.rar)]}"></span>${esc(nm(D.wnames[x.w]))}</td><td>${esc(nm(D.types[x.ty]))}</td><td class="num">${pct(x.cond, 1)}</td><td class="num">${pct(x.typeCond, 1)}</td></tr>`).join('') + '</tbody>' : '';
 }
 
