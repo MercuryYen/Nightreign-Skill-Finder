@@ -114,6 +114,7 @@ tr.best td { background: var(--accent-soft); }
 .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
 .controls.one { grid-template-columns: minmax(0, 1fr); }
 tr.sect th { background: var(--bg); color: var(--ink); font-size: .78rem; text-align: left; padding-top: 10px; }
+td.hi { background: var(--accent-soft); font-weight: 700; }
 .flag { font-size: .7rem; font-weight: 700; border-radius: 4px; padding: 1px 6px; border: 1px solid var(--accent); color: var(--accent); white-space: nowrap; }
 .flag.bad { border-color: var(--a-blood); color: var(--a-blood); }
 details.notes { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
@@ -212,7 +213,10 @@ details.notes ul { margin: 10px 0 0; padding-left: 1.2em; display: grid; gap: 6p
     <section class="summary" id="esum" aria-live="polite"></section>
     <section class="board">
       <div class="pane">
-        <div class="pane-head"><h2 id="h-pool"></h2><span class="eyebrow" id="e-pool"></span></div>
+        <div class="pane-head"><h2 id="h-any"></h2><span class="eyebrow" id="e-any"></span></div>
+        <p class="hint" id="hint-any"></p>
+        <div class="tablewrap"><table id="anyt"></table></div>
+        <div class="pane-head" style="margin-top:8px"><h2 id="h-pool"></h2><span class="eyebrow" id="e-pool"></span></div>
         <p class="hint" id="hint-pool"></p>
         <div class="tablewrap"><table id="pools"></table></div>
       </div>
@@ -252,7 +256,12 @@ const T = {
     stdGroup: { 10: '重質系', 20: '銳利系', 30: '優質系', 120: '神秘系', 130: '弓', 140: '盾・火把', x: '其他' },
     unique: '專屬戰技', affName: { std: '普通', fire: '火', lightning: '雷', holy: '聖', magic: '魔力', frost: '寒氣', poison: '毒', blood: '出血' },
     tabSkill: '戰技', tabEffect: '附加效果',
-    eff: '附加效果', esearch: '搜尋效果名稱…', eg: { reg: '一般效果', dn: '深夜・額外效果', bless: '深夜・祝福', curse: '深夜・詛咒', fixed: '僅固定效果' },
+    eff: '附加效果（可多選，再點一次取消）', epick: '在上方選擇一個或多個效果。',
+    hAny: '至少帶一個所選效果的機率', eAny: '每把武器', hintAny: '依武器顏色計算整把武器的所有效果欄位。藍、紫在深夜模式是「詛咒＋效果＋額外效果」，紅色是「詛咒＋效果＋祝福」。各欄位視為獨立抽選；普通武器有些沒有效果，這裡以有 1 個效果計算。',
+    cols: ['普通（白）', '精良（藍）', '稀有（紫）', '深夜・藍', '深夜・紫', '紅（Unique）'], effCol: '效果',
+    pgAll: { melee: '近戰武器', shield: '盾・火把', staff: '手杖', seal: '聖印記', bow: '小弓・弓', heavy: '大弓・弩・弩砲' },
+    eAnyBest: (n, g, c, p) => `${n}：最容易拿到其中任一個的是 <b>${g}・${c}</b>，每把約 <span class="big">${p}</span> 的機率至少帶一個。`,
+    esearch: '搜尋效果名稱…', eg: { reg: '一般效果', dn: '深夜・額外效果', bless: '深夜・祝福', curse: '深夜・詛咒', fixed: '僅固定效果' },
     hPool: '每次抽選機率', ePool: '依武器種與強度', hintPool: '一個效果欄位抽中此效果的機率。強度 1／2／3 分別對應普通／精良／稀有武器。',
     hFixed: '帶此固定效果的武器', hintFixed: '「掉落（屬性版本）」：這把武器的某個屬性版本固定帶此效果並占用效果欄位，例如腐敗、睡眠屬性的武器，或有屬性的弓；掉到其他屬性版本時仍是隨機抽。「特定地點」：地圖上固定放置的那一把。「稀有商人」：商人販售的固定組合，不會從掉落取得。', nFixed: n => `${n} 把`,
     src: '來源', srcDrop: '掉落（屬性版本）', srcPick: '特定地點', srcShop: '稀有商人', srcShopDn: '深夜模式的稀有商人', showAll: n => `顯示全部 ${n} 把`,
@@ -300,7 +309,12 @@ const T = {
     stdGroup: { 10: '重厚系', 20: '鋭利系', 30: '質系', 120: '神秘系', 130: '弓', 140: '盾・松明', x: 'その他' },
     unique: '専用戦技', affName: { std: '標準', fire: '炎', lightning: '雷', holy: '聖', magic: '魔力', frost: '冷気', poison: '毒', blood: '出血' },
     tabSkill: '戦技', tabEffect: '付帯効果',
-    eff: '付帯効果', esearch: '効果名で検索…', eg: { reg: '通常の効果', dn: '深き夜・追加効果', bless: '深き夜・祝福', curse: '深き夜・呪い', fixed: '固定効果のみ' },
+    eff: '付帯効果（複数選択可・もう一度押すと解除）', epick: '上で効果を1つ以上選んでください。',
+    hAny: '選んだ効果が少なくとも1つ付く確率', eAny: '武器1本あたり', hintAny: '武器の色ごとに、すべての効果枠をまとめて計算します。深き夜の青・紫は「呪い＋効果＋追加効果」、赤は「呪い＋効果＋祝福」です。各枠は独立に抽選するものとし、コモンは効果なしの場合もありますがここでは効果1つとして計算しています。',
+    cols: ['コモン（白）', 'アンコモン（青）', 'レア（紫）', '深き夜・青', '深き夜・紫', '赤（Unique）'], effCol: '効果',
+    pgAll: { melee: '近接武器', shield: '盾・松明', staff: '杖', seal: '聖印', bow: '小弓・弓', heavy: '大弓・クロスボウ・バリスタ' },
+    eAnyBest: (n, g, c, p) => `${n}：最も出やすいのは <b>${g}・${c}</b> で、1本あたり約 <span class="big">${p}</span> の確率で少なくとも1つ付きます。`,
+    esearch: '効果名で検索…', eg: { reg: '通常の効果', dn: '深き夜・追加効果', bless: '深き夜・祝福', curse: '深き夜・呪い', fixed: '固定効果のみ' },
     hPool: '1回あたりの抽選確率', ePool: '武器種・強度別', hintPool: '効果枠1つでこの効果が出る確率。強度1／2／3はコモン／アンコモン／レア武器に対応します。',
     hFixed: 'この効果が固定の武器', hintFixed: '「ドロップ（属性版）」：その武器の特定の属性版がこの効果に固定され、効果枠を使います（腐敗・睡眠属性の武器や属性付きの弓など）。他の属性版ならランダム抽選です。「特定の場所」：マップに固定配置された1本。「レア商人」：商人が売る固定の組み合わせで、ドロップでは手に入りません。', nFixed: n => `${n} 本`,
     src: '入手', srcDrop: 'ドロップ（属性版）', srcPick: '特定の場所', srcShop: 'レア商人', srcShopDn: '深き夜のレア商人', showAll: n => `全 ${n} 本を表示`,
@@ -348,7 +362,12 @@ const T = {
     stdGroup: { 10: 'Heavy', 20: 'Keen', 30: 'Quality', 120: 'Occult', 130: 'Bows', 140: 'Shields & torches', x: 'Other' },
     unique: 'Unique skills', affName: { std: 'Standard', fire: 'Fire', lightning: 'Lightning', holy: 'Holy', magic: 'Magic', frost: 'Frost', poison: 'Poison', blood: 'Blood' },
     tabSkill: 'Skills', tabEffect: 'Passive effects',
-    eff: 'Passive effect', esearch: 'Search effects…', eg: { reg: 'Regular effects', dn: 'Deep of Night extra', bless: 'Deep of Night blessing', curse: 'Deep of Night curse', fixed: 'Fixed only' },
+    eff: 'Passive effects (pick one or more; click again to remove)', epick: 'Pick one or more effects above.',
+    hAny: 'Chance of at least one selected effect', eAny: 'per weapon', hintAny: 'All effect slots of a weapon, by weapon colour. In Deep of Night, blue and purple weapons have curse + effect + extra effect; red weapons have curse + effect + blessing. Slots are treated as independent rolls; some Common weapons have no effect, counted here as having one.',
+    cols: ['Common (white)', 'Uncommon (blue)', 'Rare (purple)', 'Deep of Night blue', 'Deep of Night purple', 'Red (Unique)'], effCol: 'Effect',
+    pgAll: { melee: 'Melee weapons', shield: 'Shields & torches', staff: 'Staves', seal: 'Sacred seals', bow: 'Light bows & bows', heavy: 'Greatbows, crossbows & ballistae' },
+    eAnyBest: (n, g, c, p) => `${n}: easiest on <b>${g}, ${c}</b>, with about <span class="big">${p}</span> chance per weapon of at least one.`,
+    esearch: 'Search effects…', eg: { reg: 'Regular effects', dn: 'Deep of Night extra', bless: 'Deep of Night blessing', curse: 'Deep of Night curse', fixed: 'Fixed only' },
     hPool: 'Chance per roll', ePool: 'by weapon group and potency', hintPool: 'Chance that one effect slot rolls this effect. Potency 1 / 2 / 3 matches Common / Uncommon / Rare weapons.',
     hFixed: 'Weapons with this fixed effect', hintFixed: '"Drop (affinity version)": one affinity version of the weapon always has this effect in its slot (Rot/Sleep weapons, bows with an affinity); other versions still roll randomly. "Fixed pickup": the one copy placed on the map. "Rare Merchant": a preset combination sold by the merchant that never drops.', nFixed: n => `${n} weapons`,
     src: 'Source', srcDrop: 'Drop (affinity version)', srcPick: 'Fixed pickup', srcShop: 'Rare Merchant', srcShopDn: 'Deep of Night Rare Merchant', showAll: n => `Show all ${n}`,
@@ -694,7 +713,24 @@ function effGroup(e) {
   if (ks.includes('curse')) return 'curse';
   return 'fixed';
 }
-const est = { sel: 'Improved Attack Power at Full HP', view: 'skill' };
+const est = { sel: new Set(['Improved Attack Power at Full HP']), view: 'skill' };
+// weapon groups with the type code used to find their pools, and their blessing table
+const WGROUPS = [['melee', 1, 'Melee'], ['shield', 65, 'Shield'], ['staff', 57, 'Magic'], ['seal', 61, 'Magic'], ['bow', 51, 'Bow'], ['heavy', 53, 'Heavy Ranged']];
+const poolOf = (pre, code) => Object.keys(E.pools).find(k => k.startsWith(pre) && E.pools[k].includes(code));
+// slots of each weapon colour: [pool kind, tier index]
+const COLS = [[['reg', 0]], [['reg', 1]], [['reg', 2]], [['curse', 0], ['reg', 1], ['dn', 1]], [['curse', 1], ['reg', 2], ['dn', 2]], [['curse', 2], ['reg', 2], ['bless', 0]]];
+function slotP(keys, pool, tier) {
+  if (!pool) return 0;
+  let p = 0;
+  for (const k of keys) { const v = E.effects[k].pools[pool]; if (v) p += v[tier] || 0; }
+  return Math.min(1, p);
+}
+function anyTable(keys) {
+  return WGROUPS.map(([g, code, bl]) => {
+    const pools = { reg: poolOf('reg', code), dn: poolOf('dn', code), bless: 'bless:' + bl, curse: 'curse' };
+    return { g, vals: COLS.map(slots => 1 - slots.reduce((m, [kind, tier]) => m * (1 - slotP(keys, pools[kind], tier)), 1)) };
+  });
+}
 try { const v = localStorage.getItem('nr-view'); if (v === 'effect' || v === 'skill') est.view = v; } catch (e) {}
 
 function renderEffList() {
@@ -711,38 +747,64 @@ function renderEffList() {
     if (!list.length) continue;
     list.sort((a, b) => a[1].localeCompare(b[1], lang === 'en' ? 'en' : lang === 'ja' ? 'ja' : 'zh-Hant'));
     html += `<div class="sgroup"><div class="eyebrow"><span class="dot" style="background:${g === 'curse' ? 'var(--a-blood)' : g === 'reg' ? 'var(--a-std)' : 'var(--accent)'}"></span>${t.eg[g]}</div><div class="chips">` +
-      list.map(([k, n]) => `<button type="button" class="chip" data-eff="${esc(k)}" aria-pressed="${k === est.sel}">${esc(n)}</button>`).join('') + '</div></div>';
+      list.map(([k, n]) => `<button type="button" class="chip" data-eff="${esc(k)}" aria-pressed="${est.sel.has(k)}">${esc(n)}</button>`).join('') + '</div></div>';
   }
   $('efflist').innerHTML = html || '<div class="empty">—</div>';
 }
 
 function renderEffect() {
   const t = T[lang];
-  const e = E.effects[est.sel];
-  if (!e) return;
-  const name = nm(e.n), grp = effGroup(e);
-  const flags = ((grp === 'dn' || grp === 'bless') && !e.fixed.some(r => r[2] === 'n') ? `<span class="flag">${t.dnOnly}</span>` : '') + (grp === 'curse' ? `<span class="flag bad">${t.curseTag}</span>` : '');
-  let line;
-  if (grp === 'reg') {
-    let best = null, melee = 0;
-    for (const [k, v] of Object.entries(e.pools)) {
-      if (!k.startsWith('reg')) continue;
-      const g = POOL_GROUP(E.pools[k]), m = Math.max(...v);
-      if (g === 'melee') melee = m;
-      if (!best || m > best.m) best = { g, m };
-    }
-    line = t.eBest(esc(name), pct(melee, 2), best && best.m > melee * 1.05 ? t.pg[best.g] : '', best ? pct(best.m, 2) : '');
-  } else {
-    line = (grp === 'curse' ? t.eCurse : grp === 'fixed' ? t.eFixedOnly : t.eDnOnly)(esc(name));
-    if ((grp === 'dn' || grp === 'bless') && e.fixed.some(r => r[2] === 'n')) line += t.alsoFixed;
+  const keys = [...est.sel].filter(k => E.effects[k]);
+  if (!keys.length) {
+    $('esum').innerHTML = `<p>${t.epick}</p>`;
+    ['anyt', 'pools', 'fixed'].forEach(id => { $(id).innerHTML = ''; });
+    $('e-fixed').textContent = '';
+    return;
   }
-  $('esum').innerHTML = `<div class="skillname">${esc(name)} ${flags}</div><p>${line}</p>`;
+  const names = keys.map(k => nm(E.effects[k].n));
+  const table = anyTable(keys);
 
-  // pool table, one section per slot kind
+  // summary
+  const badge = k => {
+    const e = E.effects[k], grp = effGroup(e);
+    return ((grp === 'dn' || grp === 'bless') && !e.fixed.some(r => r[2] === 'n') ? ` <span class="flag">${t.dnOnly}</span>` : '') + (grp === 'curse' ? ` <span class="flag bad">${t.curseTag}</span>` : '');
+  };
+  let line;
+  if (keys.length === 1) {
+    const e = E.effects[keys[0]], name = names[0], grp = effGroup(e);
+    if (grp === 'reg') {
+      let best = null, melee = 0;
+      for (const [k, v] of Object.entries(e.pools)) {
+        if (!k.startsWith('reg')) continue;
+        const g = POOL_GROUP(E.pools[k]), m = Math.max(...v);
+        if (g === 'melee') melee = m;
+        if (!best || m > best.m) best = { g, m };
+      }
+      line = t.eBest(esc(name), pct(melee, 2), best && best.m > melee * 1.05 ? t.pg[best.g] : '', best ? pct(best.m, 2) : '');
+    } else {
+      line = (grp === 'curse' ? t.eCurse : grp === 'fixed' ? t.eFixedOnly : t.eDnOnly)(esc(name));
+      if ((grp === 'dn' || grp === 'bless') && e.fixed.some(r => r[2] === 'n')) line += t.alsoFixed;
+    }
+  } else {
+    let best = null;
+    table.forEach(row => row.vals.forEach((v, i) => { if (!best || v > best.v) best = { g: row.g, i, v }; }));
+    line = best && best.v > 0 ? t.eAnyBest(esc(names.join(t.sep)), t.pgAll[best.g], t.cols[best.i], pct(best.v, 1)) : '';
+  }
+  $('esum').innerHTML = `<div class="skillname">${keys.map((k, i) => `<span class="pick">${esc(names[i])}${badge(k)}</span>`).join('')}</div><p>${line}</p>`;
+
+  // at least one selected effect, per weapon group and colour
+  let maxAny = 0;
+  table.forEach(r => r.vals.forEach(v => { maxAny = Math.max(maxAny, v); }));
+  $('anyt').innerHTML = `<thead><tr><th>${t.type}</th>${t.cols.map(c => `<th class="num">${c}</th>`).join('')}</tr></thead><tbody>` +
+    table.map(r => `<tr><td>${esc(t.pgAll[r.g])}</td>${r.vals.map(v => `<td class="num${v === maxAny && v > 0 ? ' hi' : ''}">${v > 0 ? pct(v, 2) : '—'}</td>`).join('')}</tr>`).join('') + '</tbody>';
+
+  // per-roll table: chance one slot rolls any of the selected effects
   const sections = [['reg', t.sReg, t.tier], ['dn', t.sDn, t.tier], ['bless', t.sBless, null], ['curse', t.sCurse, t.lvl]];
+  const poolKeys = new Set();
+  keys.forEach(k => Object.keys(E.effects[k].pools).forEach(pk => poolKeys.add(pk)));
   let html = '';
   for (const [pre, title, heads] of sections) {
-    const rows = Object.entries(e.pools).filter(([k, v]) => k.startsWith(pre) && v.some(x => x > 0));
+    const rows = [...poolKeys].filter(k => k.startsWith(pre)).sort().map(k => [k, [0, 1, 2].map(i => slotP(keys, k, i))]).filter(([, v]) => v.some(x => x > 0));
     if (!rows.length) continue;
     const cols = heads ? heads : [t.once];
     html += `<tr class="sect"><th>${title}</th>${cols.map(c => `<th class="num">${c}</th>`).join('')}</tr>`;
@@ -755,15 +817,18 @@ function renderEffect() {
   }
   $('pools').innerHTML = html ? `<tbody>${html}</tbody>` : `<tbody><tr><td class="empty">—</td></tr></tbody>`;
 
-  // fixed-effect weapons
+  // fixed-effect weapons for any of the selected effects
+  const multi = keys.length > 1;
   const srcRank = r => r[4] === 'drop' ? (r[2] === 'n' ? 0 : 1) : r[4] === 'pick' ? 2 : (r[2] === 'n' ? 3 : 4);
-  const fx = e.fixed.slice().sort((a, b) => srcRank(a) - srcRank(b) || b[1] - a[1] || (E.ewep[a[0]][1] - E.ewep[b[0]][1]) || nm(E.ewep[a[0]][0]).localeCompare(nm(E.ewep[b[0]][0])));
+  const fx = keys.flatMap(k => E.effects[k].fixed.map(r => [...r, k]))
+    .sort((a, b) => srcRank(a) - srcRank(b) || b[1] - a[1] || (E.ewep[a[0]][1] - E.ewep[b[0]][1]) || nm(E.ewep[a[0]][0]).localeCompare(nm(E.ewep[b[0]][0])));
   $('e-fixed').textContent = fx.length ? t.nFixed(fx.length) : '';
   const LIMIT = 30, shown = est.all || fx.length <= LIMIT + 5 ? fx : fx.slice(0, LIMIT);
   const srcCell = ([, , mode, p, src]) => (src === 'pick' ? t.srcPick : src === 'drop' ? t.srcDrop + (mode === 'd' ? ` <span class="flag">${t.dnOnly}</span>` : '') : mode === 'd' ? t.srcShopDn : t.srcShop) + (p < 0.999 ? ` · ${t.chance(pct(p, 0))}` : '');
-  $('fixed').innerHTML = fx.length ? `<thead><tr><th>${t.wep}</th><th>${t.type}</th><th>${t.rarity}</th><th>${t.src}</th></tr></thead><tbody>` +
-    shown.map(r => `<tr><td><span class="rar" style="background:var(--r${Math.min(3, r[1])})"></span>${esc(nm(E.ewep[r[0]][0]))}</td><td>${esc(nm(D.types[E.ewep[r[0]][1]]) || '')}</td><td>${t.rar[Math.min(3, r[1])]}</td><td>${srcCell(r)}</td></tr>`).join('') +
-    (shown.length < fx.length ? `<tr><td colspan="4"><button type="button" class="chip" id="fx-all">${t.showAll(fx.length)}</button></td></tr>` : '') + '</tbody>'
+  const ncol = multi ? 5 : 4;
+  $('fixed').innerHTML = fx.length ? `<thead><tr><th>${t.wep}</th><th>${t.type}</th><th>${t.rarity}</th>${multi ? `<th>${t.effCol}</th>` : ''}<th>${t.src}</th></tr></thead><tbody>` +
+    shown.map(r => `<tr><td><span class="rar" style="background:var(--r${Math.min(3, r[1])})"></span>${esc(nm(E.ewep[r[0]][0]))}</td><td>${esc(nm(D.types[E.ewep[r[0]][1]]) || '')}</td><td>${t.rar[Math.min(3, r[1])]}</td>${multi ? `<td>${esc(nm(E.effects[r[5]].n))}</td>` : ''}<td>${srcCell(r)}</td></tr>`).join('') +
+    (shown.length < fx.length ? `<tr><td colspan="${ncol}"><button type="button" class="chip" id="fx-all">${t.showAll(fx.length)}</button></td></tr>` : '') + '</tbody>'
     : `<tbody><tr><td class="empty">${t.noFixed}</td></tr></tbody>`;
   const more = $('fx-all');
   if (more) more.addEventListener('click', () => { est.all = true; renderEffect(); });
@@ -773,6 +838,7 @@ function renderEffStatic() {
   const t = T[lang];
   $('tab-skill').textContent = t.tabSkill; $('tab-effect').textContent = t.tabEffect;
   $('l-eff').textContent = t.eff; $('eq').placeholder = t.esearch;
+  $('h-any').textContent = t.hAny; $('e-any').textContent = t.eAny; $('hint-any').textContent = t.hintAny;
   $('h-pool').textContent = t.hPool; $('e-pool').textContent = t.ePool; $('hint-pool').textContent = t.hintPool;
   $('h-fixed').textContent = t.hFixed; $('hint-fixed').textContent = t.hintFixed;
   $('en-title').textContent = t.enTitle;
@@ -793,9 +859,10 @@ $('eq').addEventListener('input', renderEffList);
 $('efflist').addEventListener('click', ev => {
   const b = ev.target.closest('[data-eff]');
   if (!b) return;
-  est.sel = b.dataset.eff; est.all = false;
-  document.querySelectorAll('#efflist .chip[aria-pressed="true"]').forEach(x => x.setAttribute('aria-pressed', 'false'));
-  b.setAttribute('aria-pressed', 'true');
+  const key = b.dataset.eff;
+  est.sel.has(key) ? est.sel.delete(key) : est.sel.add(key);
+  est.all = false;
+  b.setAttribute('aria-pressed', String(est.sel.has(key)));
   renderEffect();
 });
 
