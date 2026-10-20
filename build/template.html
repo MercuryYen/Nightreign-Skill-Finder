@@ -252,21 +252,22 @@ const T = {
     stdGroup: { 10: '重質系', 20: '銳利系', 30: '優質系', 120: '神秘系', 130: '弓', 140: '盾・火把', x: '其他' },
     unique: '專屬戰技', affName: { std: '普通', fire: '火', lightning: '雷', holy: '聖', magic: '魔力', frost: '寒氣', poison: '毒', blood: '出血' },
     tabSkill: '戰技', tabEffect: '附加效果',
-    eff: '附加效果', esearch: '搜尋效果名稱…', eg: { reg: '一般效果', dn: '深き夜・額外效果', bless: '深き夜・祝福', curse: '深き夜・詛咒', fixed: '僅固定效果' },
+    eff: '附加效果', esearch: '搜尋效果名稱…', eg: { reg: '一般效果', dn: '深夜・額外效果', bless: '深夜・祝福', curse: '深夜・詛咒', fixed: '僅固定效果' },
     hPool: '每次抽選機率', ePool: '依武器種與強度', hintPool: '一個效果欄位抽中此效果的機率。強度 1／2／3 分別對應普通／精良／稀有武器。',
-    hFixed: '帶此固定效果的武器', hintFixed: '這些武器的效果是預先設定好的。「掉落」是頭目或寶箱會掉出的版本（多半是腐敗、睡眠屬性或弓的屬性版本）；「稀有商人」是商人販售的固定組合，不會從掉落取得。', nFixed: n => `${n} 把`,
-    src: '來源', srcDrop: '掉落', srcShop: '稀有商人', srcShopDn: '深き夜的稀有商人', showAll: n => `顯示全部 ${n} 把`,
+    hFixed: '帶此固定效果的武器', hintFixed: '「掉落（屬性版本）」：這把武器的某個屬性版本固定帶此效果並占用效果欄位，例如腐敗、睡眠屬性的武器，或有屬性的弓；掉到其他屬性版本時仍是隨機抽。「特定地點」：地圖上固定放置的那一把。「稀有商人」：商人販售的固定組合，不會從掉落取得。', nFixed: n => `${n} 把`,
+    src: '來源', srcDrop: '掉落（屬性版本）', srcPick: '特定地點', srcShop: '稀有商人', srcShopDn: '深夜模式的稀有商人', showAll: n => `顯示全部 ${n} 把`,
     tier: ['強度 1', '強度 2', '強度 3'], lvl: ['詛咒 1', '詛咒 2', '詛咒 3'], once: '每次抽選',
-    sReg: '一般欄位', sDn: '深き夜・額外欄位', sBless: '深き夜・祝福欄位', sCurse: '深き夜・詛咒欄位',
+    sReg: '一般欄位', sDn: '深夜・額外欄位', sBless: '深夜・祝福欄位', sCurse: '深夜・詛咒欄位',
     pg: { melee: '近戰武器', shield: '盾・火把', staff: '手杖', seal: '聖印記', ranged: '弓・弩', 'Melee': '近戰武器', 'Bow': '小弓・弓', 'Heavy Ranged': '大弓・弩・弩砲', 'Magic': '手杖・聖印記', 'Shield': '盾' },
-    dnOnly: '深き夜限定', curseTag: '負面效果', noFixed: '沒有武器固定帶此效果。', chance: p => `機率 ${p}`,
+    dnOnly: '深夜限定', curseTag: '負面效果', noFixed: '沒有武器固定帶此效果。', chance: p => `機率 ${p}`,
     eBest: (n, p, g, q) => `一般武器每個效果欄位抽中「${n}」的機率約 <span class="big">${p}</span>` + (g ? `；在 <b>${g}</b> 上最高，約 <span class="big">${q}</span>。` : '。'),
-    eDnOnly: n => `「${n}」的隨機抽選只會出現在深き夜的額外欄位或祝福欄位。`, alsoFixed: '一般模式只能從下方「固定效果」的武器拿到。',
-    eCurse: n => `「${n}」是深き夜武器的詛咒（負面效果）。`,
+    eDnOnly: n => `「${n}」的隨機抽選只會出現在深夜的額外欄位或祝福欄位。`, alsoFixed: '一般模式只能從下方「固定效果」的武器拿到。',
+    eCurse: n => `「${n}」是深夜武器的詛咒（負面效果）。`,
     eFixedOnly: n => `「${n}」不在任何隨機抽選表中，只有特定武器固定帶有。`,
     enTitle: '附加效果的抽法',
     enNotes: [
-      '效果欄位數量由稀有度決定：普通武器 0～1 個、精良與稀有 1 個；深き夜的武器另外是「詛咒＋效果＋額外效果」或「詛咒＋效果＋祝福」，因此會出現 3 個效果。',
+      '效果欄位數量由稀有度決定：普通武器 0～1 個、精良與稀有 1 個。深夜模式的精良、稀有武器改成「詛咒＋效果＋額外效果」三格。',
+      '祝福欄位是「Unique」等級武器的第三格：這類武器固定是「詛咒＋效果＋祝福」，第二格仍是一般效果，祝福是第三格，抽的是蓄力攻擊特效等較強的效果。這類武器只會從 Variant／Condemned／Cataclysm 版本的頭目與少數特殊敵人掉出。',
       '大部分效果在所有武器上機率相同，但各武器類別有自己的專長效果權重較高：手杖的強化魔法、弓弩的強化射擊、盾的防禦相關效果約為 2 倍以上。',
       '腐敗、睡眠屬性的武器，第一個效果欄位固定是「攻擊附加腐敗／睡眠」，少了一次隨機抽選。',
       '表中是單一欄位的抽選機率。同一把武器的多個效果之間可能有不重複的規則（資料中有相容性分組），這部分尚未驗證。',
@@ -301,8 +302,8 @@ const T = {
     tabSkill: '戦技', tabEffect: '付帯効果',
     eff: '付帯効果', esearch: '効果名で検索…', eg: { reg: '通常の効果', dn: '深き夜・追加効果', bless: '深き夜・祝福', curse: '深き夜・呪い', fixed: '固定効果のみ' },
     hPool: '1回あたりの抽選確率', ePool: '武器種・強度別', hintPool: '効果枠1つでこの効果が出る確率。強度1／2／3はコモン／アンコモン／レア武器に対応します。',
-    hFixed: 'この効果が固定の武器', hintFixed: 'これらの武器の効果はあらかじめ決まっています。「ドロップ」はボスや宝箱から出る版（主に腐敗・睡眠属性や弓の属性版）、「レア商人」は商人が売る固定の組み合わせで、ドロップでは手に入りません。', nFixed: n => `${n} 本`,
-    src: '入手', srcDrop: 'ドロップ', srcShop: 'レア商人', srcShopDn: '深き夜のレア商人', showAll: n => `全 ${n} 本を表示`,
+    hFixed: 'この効果が固定の武器', hintFixed: '「ドロップ（属性版）」：その武器の特定の属性版がこの効果に固定され、効果枠を使います（腐敗・睡眠属性の武器や属性付きの弓など）。他の属性版ならランダム抽選です。「特定の場所」：マップに固定配置された1本。「レア商人」：商人が売る固定の組み合わせで、ドロップでは手に入りません。', nFixed: n => `${n} 本`,
+    src: '入手', srcDrop: 'ドロップ（属性版）', srcPick: '特定の場所', srcShop: 'レア商人', srcShopDn: '深き夜のレア商人', showAll: n => `全 ${n} 本を表示`,
     tier: ['強度1', '強度2', '強度3'], lvl: ['呪い1', '呪い2', '呪い3'], once: '1回あたり',
     sReg: '通常の効果枠', sDn: '深き夜・追加効果枠', sBless: '深き夜・祝福枠', sCurse: '深き夜・呪い枠',
     pg: { melee: '近接武器', shield: '盾・松明', staff: '杖', seal: '聖印', ranged: '弓・クロスボウ', 'Melee': '近接武器', 'Bow': '小弓・弓', 'Heavy Ranged': '大弓・クロスボウ・バリスタ', 'Magic': '杖・聖印', 'Shield': '盾' },
@@ -313,7 +314,8 @@ const T = {
     eFixedOnly: n => `「${n}」はランダム抽選の表になく、特定の武器にだけ固定で付きます。`,
     enTitle: '付帯効果の抽選について',
     enNotes: [
-      '効果枠の数はレア度で決まります：コモン 0～1、アンコモンとレア 1。深き夜の武器は「呪い＋効果＋追加効果」または「呪い＋効果＋祝福」なので、効果が3つになります。',
+      '効果枠の数はレア度で決まります：コモン 0～1、アンコモンとレア 1。深き夜ではアンコモン・レア武器が「呪い＋効果＋追加効果」の3枠になります。',
+      '祝福枠は「Unique」等級の武器の3枠目です。この武器は常に「呪い＋効果＋祝福」で、2枠目は通常の効果、3枠目の祝福ではタメ攻撃の特殊効果など強力な効果が抽選されます。Variant／Condemned／Cataclysm 版のボスと一部の特殊な敵からのみドロップします。',
       'ほとんどの効果はどの武器でも同じ確率ですが、武器カテゴリごとに得意な効果の重みが高くなっています（杖の魔術強化、弓の射撃強化、盾のガード系など、約2倍以上）。',
       '腐敗・睡眠属性の武器は、最初の効果枠が「攻撃に腐敗／睡眠が付く」に固定され、ランダム抽選が1回少なくなります。',
       '表は効果枠1つあたりの確率です。同じ武器の複数の効果の間には重複しない規則がある可能性があります（データに互換グループあり、未検証）。',
@@ -348,8 +350,8 @@ const T = {
     tabSkill: 'Skills', tabEffect: 'Passive effects',
     eff: 'Passive effect', esearch: 'Search effects…', eg: { reg: 'Regular effects', dn: 'Deep of Night extra', bless: 'Deep of Night blessing', curse: 'Deep of Night curse', fixed: 'Fixed only' },
     hPool: 'Chance per roll', ePool: 'by weapon group and potency', hintPool: 'Chance that one effect slot rolls this effect. Potency 1 / 2 / 3 matches Common / Uncommon / Rare weapons.',
-    hFixed: 'Weapons with this fixed effect', hintFixed: 'These weapons come with the effect preset. "Drop" versions come from bosses or chests (mostly Rot/Sleep affinity weapons and affinity bows); "Rare Merchant" entries are fixed combinations sold by the merchant and never drop.', nFixed: n => `${n} weapons`,
-    src: 'Source', srcDrop: 'Drop', srcShop: 'Rare Merchant', srcShopDn: 'Deep of Night Rare Merchant', showAll: n => `Show all ${n}`,
+    hFixed: 'Weapons with this fixed effect', hintFixed: '"Drop (affinity version)": one affinity version of the weapon always has this effect in its slot (Rot/Sleep weapons, bows with an affinity); other versions still roll randomly. "Fixed pickup": the one copy placed on the map. "Rare Merchant": a preset combination sold by the merchant that never drops.', nFixed: n => `${n} weapons`,
+    src: 'Source', srcDrop: 'Drop (affinity version)', srcPick: 'Fixed pickup', srcShop: 'Rare Merchant', srcShopDn: 'Deep of Night Rare Merchant', showAll: n => `Show all ${n}`,
     tier: ['Potency 1', 'Potency 2', 'Potency 3'], lvl: ['Curse 1', 'Curse 2', 'Curse 3'], once: 'Per roll',
     sReg: 'Regular slot', sDn: 'Deep of Night extra slot', sBless: 'Deep of Night blessing slot', sCurse: 'Deep of Night curse slot',
     pg: { melee: 'Melee weapons', shield: 'Shields & torches', staff: 'Staves', seal: 'Sacred seals', ranged: 'Bows & crossbows', 'Melee': 'Melee weapons', 'Bow': 'Light bows & bows', 'Heavy Ranged': 'Greatbows, crossbows & ballistae', 'Magic': 'Staves & seals', 'Shield': 'Shields' },
@@ -360,7 +362,8 @@ const T = {
     eFixedOnly: n => `${n} is not in any random table; only specific weapons carry it as a fixed effect.`,
     enTitle: 'How passive effects roll',
     enNotes: [
-      'Rarity sets the number of effect slots: Common 0 to 1, Uncommon and Rare 1. Deep of Night weapons have curse + effect + extra effect, or curse + effect + blessing, which is where three effects come from.',
+      'Rarity sets the number of effect slots: Common 0 to 1, Uncommon and Rare 1. In Deep of Night, Uncommon and Rare weapons switch to three slots: curse + effect + extra effect.',
+      'The blessing slot is the third slot of "Unique" tier weapons, which always have curse + effect + blessing: the second slot is a regular effect, and the blessing rolls stronger effects such as charge-attack procs. These weapons only drop from Variant / Condemned / Cataclysm bosses and a few special enemies.',
       'Most effects have the same odds on every weapon, but each weapon group weights its specialty higher: Improved Sorceries on staves, Improved Ranged Weapon Attacks on bows, guard effects on shields, each roughly double or more.',
       'Rot and Sleep affinity weapons have their first slot fixed to the status effect, so they get one fewer random roll.',
       'The table shows one slot\'s odds. Several effects on one weapon may follow a no-duplicate rule (the data has compatibility groups); this is not verified.',
@@ -753,11 +756,11 @@ function renderEffect() {
   $('pools').innerHTML = html ? `<tbody>${html}</tbody>` : `<tbody><tr><td class="empty">—</td></tr></tbody>`;
 
   // fixed-effect weapons
-  const srcRank = r => r[4] === 'drop' ? (r[2] === 'n' ? 0 : 1) : (r[2] === 'n' ? 2 : 3);
+  const srcRank = r => r[4] === 'drop' ? (r[2] === 'n' ? 0 : 1) : r[4] === 'pick' ? 2 : (r[2] === 'n' ? 3 : 4);
   const fx = e.fixed.slice().sort((a, b) => srcRank(a) - srcRank(b) || b[1] - a[1] || (E.ewep[a[0]][1] - E.ewep[b[0]][1]) || nm(E.ewep[a[0]][0]).localeCompare(nm(E.ewep[b[0]][0])));
   $('e-fixed').textContent = fx.length ? t.nFixed(fx.length) : '';
   const LIMIT = 30, shown = est.all || fx.length <= LIMIT + 5 ? fx : fx.slice(0, LIMIT);
-  const srcCell = ([, , mode, p, src]) => (src === 'drop' ? t.srcDrop + (mode === 'd' ? ` <span class="flag">${t.dnOnly}</span>` : '') : mode === 'd' ? t.srcShopDn : t.srcShop) + (p < 0.999 ? ` · ${t.chance(pct(p, 0))}` : '');
+  const srcCell = ([, , mode, p, src]) => (src === 'pick' ? t.srcPick : src === 'drop' ? t.srcDrop + (mode === 'd' ? ` <span class="flag">${t.dnOnly}</span>` : '') : mode === 'd' ? t.srcShopDn : t.srcShop) + (p < 0.999 ? ` · ${t.chance(pct(p, 0))}` : '');
   $('fixed').innerHTML = fx.length ? `<thead><tr><th>${t.wep}</th><th>${t.type}</th><th>${t.rarity}</th><th>${t.src}</th></tr></thead><tbody>` +
     shown.map(r => `<tr><td><span class="rar" style="background:var(--r${Math.min(3, r[1])})"></span>${esc(nm(E.ewep[r[0]][0]))}</td><td>${esc(nm(D.types[E.ewep[r[0]][1]]) || '')}</td><td>${t.rar[Math.min(3, r[1])]}</td><td>${srcCell(r)}</td></tr>`).join('') +
     (shown.length < fx.length ? `<tr><td colspan="4"><button type="button" class="chip" id="fx-all">${t.showAll(fx.length)}</button></td></tr>` : '') + '</tbody>'
