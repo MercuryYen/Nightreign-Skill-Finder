@@ -172,7 +172,6 @@ details.notes ul { margin: 10px 0 0; padding-left: 1.2em; display: grid; gap: 6p
         <div class="checks">
           <label><input type="checkbox" id="v-base" checked> <span id="t-v-base"></span></label>
           <label><input type="checkbox" id="v-v"> <span id="t-v-v"></span></label>
-          <label><input type="checkbox" id="v-c"> <span id="t-v-c"></span></label>
           <label><input type="checkbox" id="v-x"> <span id="t-v-x"></span></label>
         </div>
       </div>
@@ -246,13 +245,15 @@ details.notes ul { margin: 10px 0 0; padding-left: 1.2em; display: grid; gap: 6p
 (function () {
 'use strict';
 const D = JSON.parse(document.getElementById('data').textContent);
+// the data tags site bosses inside a cataclysm "Condemned" on Limveld and "Cataclysm" on the Great Hollow; treat both as 災域
+for (const g of D.groups) if (g.var === 'c') g.var = 'x';
 
 const T = {
   zh: {
     title: '黑夜君臨 戰技尋獲表', sub: '選一個戰技，找出最容易拿到它的地點與武器種',
     skill: '戰技（可多選，再點一次取消）', pick: '在上方選擇一個或多個戰技。', sep: '、', search: '搜尋戰技名稱…', cls: '易發現的武器種（影響「職業武器」獎勵欄位）', avg: '角色預設・10 名平均', grpHero: '角色預設', grpType: '指定武器種（深夜模式）',
     map: '地圖', mapAll: '全部地圖', limveld: '寧姆韋德', hollow: '大空洞（DLC）',
-    vars: '版本', vbase: '一般', vv: '變異個體', vc: '罪人', vx: '災域',
+    vars: '版本', vbase: '一般', vv: '變異個體', vx: '災域',
     kinds: '來源', ksite: '有屬性標記的據點（營地・遺跡・大教堂…）', kother: '其他頭目（野外・城・封牢・地變…）',
     locs: '推薦地點', locsE: '擊敗頭目 → 獎勵選項', hintLocs: '百分比 = 擊敗該頭目後，獎勵選項中至少出現一把帶所選戰技（任一個）的武器的機率。',
     sub1: '每個選項', detail: '武器種分析', hintTypes: '條件機率 = 在這裡掉出該武器種時，戰技是這一個的機率，依獎勵欄位分開計算。「一般欄位」是所有武器種混抽的欄位；「職業武器欄位」只會出「易發現的武器種」，戰技池可能不同。「占比」= 此戰技的武器中有多少是該武器種。',
@@ -284,7 +285,7 @@ const T = {
     enTitle: '附加效果的抽法',
     enNotes: [
       '效果欄位數量由稀有度決定：普通武器 0～1 個、精良與稀有 1 個。深夜模式的精良、稀有武器改成「詛咒＋效果＋額外效果」三格。',
-      '祝福欄位是「Unique」等級武器的第三格：這類武器固定是「詛咒＋效果＋祝福」，第二格仍是一般效果，祝福是第三格，抽的是蓄力攻擊特效等較強的效果。這類武器主要從變異個體版本的頭目掉出（據點、城、野外頭目約 35%～100%，封印監牢 5%～35%）；災域與罪人版本的據點頭目第一個獎勵選項有 2.5%～10%；一般版本的頭目不會掉。',
+      '祝福欄位是「Unique」等級武器的第三格：這類武器固定是「詛咒＋效果＋祝福」，第二格仍是一般效果，祝福是第三格，抽的是蓄力攻擊特效等較強的效果。這類武器主要從變異個體版本的頭目掉出（據點、城、野外頭目約 35%～100%，封印監牢 5%～35%）；災域版本的據點頭目第一個獎勵選項有 2.5%～10%；一般版本的頭目不會掉。',
       '大部分效果在所有武器上機率相同，但各武器類別有自己的專長效果權重較高：手杖的強化魔法、弓弩的強化射擊、盾的防禦相關效果約為 2 倍以上。',
       '腐敗、睡眠屬性的武器，第一個效果欄位固定是「攻擊附加腐敗／睡眠」，少了一次隨機抽選。',
       '表中是單一欄位的抽選機率。同一把武器的多個效果之間可能有不重複的規則（資料中有相容性分組），這部分尚未驗證。',
@@ -298,14 +299,14 @@ const T = {
       '頭目的每一列掉落視為一個獎勵選項，「至少出現一次」= 1 − Π(1 − 各選項機率)。寶箱與一般敵人掉落未列入。',
       '「職業武器」獎勵欄位只會出「易發現的武器種」。平常是角色預設（追蹤者→大劍、女爵→短劍…）；深夜模式可以自己指定，指定後這一欄必定是該武器種，整體機率會跟著改變（例如指定重刺劍時，王朝劍技的機率會大幅提高）。「10 名平均」是把 10 名角色的預設等權平均。',
       '普通戰技依遊戲資料的排序分組（重質系・銳利系・優質系・神秘系，即原作戰灰的預設變質）。黑夜君臨已取消這些變質，分組只是方便查找，不影響機率。',
-      '變異個體、罪人、災域是同一頭目的不同版本（遊戲資料中各有獨立的掉落表；罪人版本只出現在寧姆韋德的據點，災域版本只出現在大空洞的據點）。預設只顯示一般版本。'
+      '變異個體、災域是同一頭目的不同版本，遊戲資料中各有獨立的掉落表。災域是黑夜滲出的區域，位在災域裡的據點頭目掉落較好；罪人則是從災域入侵的敵人，不是頭目的版本。寧姆韋德與大空洞的災域在資料中結構相同，這裡合併為同一個版本（依遊戲文字與資料結構推斷）。預設只顯示一般版本。'
     ]
   },
   ja: {
     title: 'ナイトレイン 戦技ファインダー', sub: '戦技を選ぶと、入手しやすい場所と武器種を表示します',
     skill: '戦技（複数選択可・もう一度押すと解除）', pick: '上で戦技を1つ以上選んでください。', sep: '、', search: '戦技名で検索…', cls: '見つけやすい武器種（「キャラ武器」報酬枠に影響）', avg: 'キャラ既定・10キャラ平均', grpHero: 'キャラ既定', grpType: '武器種を指定（深き夜）',
     map: 'マップ', mapAll: 'すべて', limveld: 'リムベルド', hollow: '大空洞（DLC）',
-    vars: 'バージョン', vbase: '通常', vv: '変異体', vc: '罪人', vx: '災域',
+    vars: 'バージョン', vbase: '通常', vv: '変異体', vx: '災域',
     kinds: '入手元', ksite: '属性マークのある拠点（野営地・遺跡・大教会…）', kother: 'その他のボス（フィールド・城・封牢・地変…）',
     locs: 'おすすめの場所', locsE: 'ボス撃破 → 報酬の選択肢', hintLocs: '％＝ボス撃破後の報酬の選択肢に、選んだ戦技（いずれか）の武器が少なくとも1つ出る確率。',
     sub1: '各選択肢', detail: '武器種の内訳', hintTypes: '条件付き確率＝ここでその武器種が出たとき、戦技がこれになる確率（報酬枠ごとに計算）。「通常の枠」は全武器種から抽選される枠、「キャラ武器枠」は「見つけやすい武器種」だけが出る枠で、戦技プールが異なる場合があります。「割合」＝この戦技の武器のうち、その武器種が占める割合。',
@@ -337,7 +338,7 @@ const T = {
     enTitle: '付帯効果の抽選について',
     enNotes: [
       '効果枠の数はレア度で決まります：コモン 0～1、アンコモンとレア 1。深き夜ではアンコモン・レア武器が「呪い＋効果＋追加効果」の3枠になります。',
-      '祝福枠は「Unique」等級の武器の3枠目です。この武器は常に「呪い＋効果＋祝福」で、2枠目は通常の効果、3枠目の祝福ではタメ攻撃の特殊効果など強力な効果が抽選されます。主に変異体版のボスがドロップします（拠点・城・フィールドボスで約35%～100%、封牢で5%～35%）。災域・罪人版の拠点ボスは最初の報酬枠で2.5%～10%、通常版のボスはドロップしません。',
+      '祝福枠は「Unique」等級の武器の3枠目です。この武器は常に「呪い＋効果＋祝福」で、2枠目は通常の効果、3枠目の祝福ではタメ攻撃の特殊効果など強力な効果が抽選されます。主に変異体版のボスがドロップします（拠点・城・フィールドボスで約35%～100%、封牢で5%～35%）。災域版の拠点ボスは最初の報酬枠で2.5%～10%、通常版のボスはドロップしません。',
       'ほとんどの効果はどの武器でも同じ確率ですが、武器カテゴリごとに得意な効果の重みが高くなっています（杖の魔術強化、弓の射撃強化、盾のガード系など、約2倍以上）。',
       '腐敗・睡眠属性の武器は、最初の効果枠が「攻撃に腐敗／睡眠が付く」に固定され、ランダム抽選が1回少なくなります。',
       '表は効果枠1つあたりの確率です。同じ武器の複数の効果の間には重複しない規則がある可能性があります（データに互換グループあり、未検証）。',
@@ -351,14 +352,14 @@ const T = {
       'ボスのドロップ各行を報酬の選択肢1つとみなし、「少なくとも1回」＝ 1 − Π(1 − 各選択肢の確率) で計算しています。宝箱や雑魚敵のドロップは含みません。',
       '「キャラ武器」報酬枠からは「見つけやすい武器種」だけが出ます。通常はキャラ既定（追跡者→大剣、レディ→短剣 など）、深き夜では自分で指定でき、その武器種が必ず出るため全体の確率が変わります（例：重刺剣を指定すると王朝剣技の確率が大きく上がる）。「10キャラ平均」は各キャラ既定の等重み平均です。',
       '標準の戦技はゲームデータの並び順で分類しています（重厚系・鋭利系・質系・神秘系＝原作の戦灰の初期派生）。ナイトレインではこれらの派生は廃止されており、分類は探しやすくするためで確率には影響しません。',
-      '変異体・罪人・災域は同じボスの別バージョンです（ゲームデータ上それぞれ別のドロップ表を持ち、罪人版はリムベルドの拠点、災域版は大空洞の拠点にのみあります）。初期表示は通常版のみ。'
+      '変異体・災域は同じボスの別バージョンで、ゲームデータ上それぞれ別のドロップ表を持ちます。災域は夜が滲み出た地域で、その中の拠点ボスはドロップが良くなります。罪人は災域から侵入してくる敵で、ボスのバージョンではありません。リムベルドと大空洞の災域はデータ上同じ構造なので、ここでは1つのバージョンにまとめています（ゲーム内テキストとデータ構造からの推定）。初期表示は通常版のみ。'
     ]
   },
   en: {
     title: 'Nightreign Skill Finder', sub: 'Pick a skill to see where and on which weapon types it drops most often',
     skill: 'Skills (pick one or more; click again to remove)', pick: 'Pick one or more skills above.', sep: ' / ', search: 'Search skills…', cls: 'Favoured weapon type (class-weapon reward slot)', avg: 'Hero default, average of 10', grpHero: 'Hero default', grpType: 'Chosen type (Deep of Night)',
     map: 'Map', mapAll: 'All maps', limveld: 'Limveld', hollow: 'Great Hollow (DLC)',
-    vars: 'Version', vbase: 'Normal', vv: 'Variant', vc: 'Condemned', vx: 'Cataclysm',
+    vars: 'Version', vbase: 'Normal', vv: 'Variant', vx: 'Cataclysm',
     kinds: 'Sources', ksite: 'Affinity-marked sites (encampments, ruins, churches…)', kother: 'Other bosses (field, castle, evergaol, shifting earth…)',
     locs: 'Best places', locsE: 'Boss kill → reward choices', hintLocs: 'Percent = chance that at least one reward choice after the boss is a weapon with any of the selected skills.',
     sub1: 'per choice', detail: 'Weapon types', hintTypes: 'Conditional = if this weapon type drops here, the chance it carries this skill, counted per reward slot. "General slots" roll every weapon type; the "class-weapon slot" only rolls the favoured weapon type and can have a different skill pool. "Share" = how many of this skill\'s drops are this type.',
@@ -390,7 +391,7 @@ const T = {
     enTitle: 'How passive effects roll',
     enNotes: [
       'Rarity sets the number of effect slots: Common 0 to 1, Uncommon and Rare 1. In Deep of Night, Uncommon and Rare weapons switch to three slots: curse + effect + extra effect.',
-      'The blessing slot is the third slot of "Unique" tier weapons, which always have curse + effect + blessing: the second slot is a regular effect, and the blessing rolls stronger effects such as charge-attack procs. They mostly drop from Variant bosses (about 35% to 100% at sites, castles and field bosses, 5% to 35% at evergaols); Cataclysm and Condemned site bosses have 2.5% to 10% in the first reward choice; normal bosses never drop them.',
+      'The blessing slot is the third slot of "Unique" tier weapons, which always have curse + effect + blessing: the second slot is a regular effect, and the blessing rolls stronger effects such as charge-attack procs. They mostly drop from Variant bosses (about 35% to 100% at sites, castles and field bosses, 5% to 35% at evergaols); Cataclysm site bosses have 2.5% to 10% in the first reward choice; normal bosses never drop them.',
       'Most effects have the same odds on every weapon, but each weapon group weights its specialty higher: Improved Sorceries on staves, Improved Ranged Weapon Attacks on bows, guard effects on shields, each roughly double or more.',
       'Rot and Sleep affinity weapons have their first slot fixed to the status effect, so they get one fewer random roll.',
       'The table shows one slot\'s odds. Several effects on one weapon may follow a no-duplicate rule (the data has compatibility groups); this is not verified.',
@@ -404,7 +405,7 @@ const T = {
       'Each drop row of a boss counts as one reward choice; "at least once" = 1 − Π(1 − p of each choice). Chests and regular enemies are not included.',
       'The class-weapon reward slot only rolls the favoured weapon type. Normally that is the hero default (Wylder → greatswords, Duchess → daggers…); in Deep of Night you can pick it yourself, and the slot then always gives that type, which shifts the overall odds (picking heavy thrusting swords makes Dynast\'s Finesse much more likely). "Average of 10" weights each hero default equally.',
       'Standard skills are grouped by the game data\'s sort order (Heavy, Keen, Quality, Occult: the default affinities of the original Ashes of War). Nightreign removed these affinities; the groups only make skills easier to find and do not change the odds.',
-      'Variant, Condemned and Cataclysm are other versions of the same boss, each with its own drop table in the game data (Condemned versions only exist at Limveld sites, Cataclysm versions only at Great Hollow sites). Only the normal version is shown by default.'
+      'Variant and Cataclysm are other versions of the same boss, each with its own drop table in the game data. A cataclysm is a region where the Night seeps in, and site bosses inside one drop better rewards; the Condemned are enemies who invade through a cataclysm, not a boss version. Limveld and Great Hollow cataclysms share the same data layout, so they are merged into one version here (inferred from the game text and data). Only the normal version is shown by default.'
     ]
   }
 };
@@ -545,7 +546,7 @@ function analyse(skill) {
 // ---------- rendering ----------
 const $ = id => document.getElementById(id);
 function skillLabel(key) { const s = SK.get(key); return s ? nm(s.n) : key; }
-function varTag(v) { const t = T[lang]; return v === 'v' ? t.vv : v === 'c' ? t.vc : v === 'x' ? t.vx : ''; }
+function varTag(v) { const t = T[lang]; return v === 'v' ? t.vv : v === 'x' ? t.vx : ''; }
 
 function renderStatic() {
   const t = T[lang];
@@ -557,7 +558,7 @@ function renderStatic() {
   $('l-cls').textContent = t.cls;
   $('l-map').textContent = t.map;
   $('l-var').textContent = t.vars;
-  $('t-v-base').textContent = t.vbase; $('t-v-v').textContent = t.vv; $('t-v-c').textContent = t.vc; $('t-v-x').textContent = t.vx;
+  $('t-v-base').textContent = t.vbase; $('t-v-v').textContent = t.vv; $('t-v-x').textContent = t.vx;
   $('l-kind').textContent = t.kinds; $('t-k-site').textContent = t.ksite; $('t-k-other').textContent = t.kother;
   $('h-locs').textContent = t.locs; $('e-locs').textContent = t.locsE; $('hint-locs').textContent = t.hintLocs;
   $('h-weps').textContent = t.weps; $('hint-weps').textContent = t.hintWeps; $('hint-types').textContent = t.hintTypes;
@@ -703,7 +704,7 @@ $('skilllist').addEventListener('click', e => {
 });
 $('cls').addEventListener('change', e => { st.cls = e.target.value; refresh(); });
 $('map').addEventListener('change', e => { st.map = e.target.value; refresh(); });
-[['v-base', ''], ['v-v', 'v'], ['v-c', 'c'], ['v-x', 'x']].forEach(([id, v]) => $(id).addEventListener('change', e => { e.target.checked ? st.vars.add(v) : st.vars.delete(v); refresh(); }));
+[['v-base', ''], ['v-v', 'v'], ['v-x', 'x']].forEach(([id, v]) => $(id).addEventListener('change', e => { e.target.checked ? st.vars.add(v) : st.vars.delete(v); refresh(); }));
 $('k-site').addEventListener('change', e => { st.site = e.target.checked; refresh(); });
 $('k-other').addEventListener('change', e => { st.other = e.target.checked; refresh(); });
 function pick(li) { const r = lastRes[+li.dataset.i]; if (!r) return; st.sel = r.g; document.querySelectorAll('.loc').forEach(x => x.setAttribute('aria-selected', String(x === li))); renderDetail(); }
