@@ -27,6 +27,9 @@ for cid, en in CLASS_EN.items():
             break
     classes[cid] = found or {'en': en, 'ja': en, 'zh': en}
 data['classes'] = classes
+# weapon passive effects (pools per weapon group, fixed-effect weapons)
+eff = json.load(open(work / 'effects.json', encoding='utf-8'))
+data['E'] = eff
 
 tpl = (HERE / 'template.html').read_text(encoding='utf-8')
 blob = json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
