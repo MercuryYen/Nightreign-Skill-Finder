@@ -251,8 +251,8 @@ const T = {
   zh: {
     title: '黑夜君臨 戰技尋獲表', sub: '選一個戰技，找出最容易拿到它的地點與武器種',
     skill: '戰技（可多選，再點一次取消）', pick: '在上方選擇一個或多個戰技。', sep: '、', search: '搜尋戰技名稱…', cls: '易發現的武器種（影響「職業武器」獎勵欄位）', avg: '角色預設・10 名平均', grpHero: '角色預設', grpType: '指定武器種（深夜模式）',
-    map: '地圖', mapAll: '全部地圖', limveld: '一般地圖', hollow: '大空洞（DLC）',
-    vars: '版本', vbase: '一般', vv: 'Variant 變體', vc: 'Condemned', vx: 'Cataclysm 劇變',
+    map: '地圖', mapAll: '全部地圖', limveld: '寧姆韋德', hollow: '大空洞（DLC）',
+    vars: '版本', vbase: '一般', vv: '變異個體', vc: '罪人', vx: '災域',
     kinds: '來源', ksite: '有屬性標記的據點（營地・遺跡・大教堂…）', kother: '其他頭目（野外・城・封牢・地變…）',
     locs: '推薦地點', locsE: '擊敗頭目 → 獎勵選項', hintLocs: '百分比 = 擊敗該頭目後，獎勵選項中至少出現一把帶所選戰技（任一個）的武器的機率。',
     sub1: '每個選項', detail: '武器種分析', hintTypes: '條件機率 = 在這裡掉出該武器種時，戰技是這一個的機率，依獎勵欄位分開計算。「一般欄位」是所有武器種混抽的欄位；「職業武器欄位」只會出「易發現的武器種」，戰技池可能不同。「占比」= 此戰技的武器中有多少是該武器種。',
@@ -284,7 +284,7 @@ const T = {
     enTitle: '附加效果的抽法',
     enNotes: [
       '效果欄位數量由稀有度決定：普通武器 0～1 個、精良與稀有 1 個。深夜模式的精良、稀有武器改成「詛咒＋效果＋額外效果」三格。',
-      '祝福欄位是「Unique」等級武器的第三格：這類武器固定是「詛咒＋效果＋祝福」，第二格仍是一般效果，祝福是第三格，抽的是蓄力攻擊特效等較強的效果。這類武器只會從 Variant／Condemned／Cataclysm 版本的頭目與少數特殊敵人掉出。',
+      '祝福欄位是「Unique」等級武器的第三格：這類武器固定是「詛咒＋效果＋祝福」，第二格仍是一般效果，祝福是第三格，抽的是蓄力攻擊特效等較強的效果。這類武器主要從變異個體版本的頭目掉出（據點、城、野外頭目約 35%～100%，封印監牢 5%～35%）；災域與罪人版本的據點頭目第一個獎勵選項有 2.5%～10%；一般版本的頭目不會掉。',
       '大部分效果在所有武器上機率相同，但各武器類別有自己的專長效果權重較高：手杖的強化魔法、弓弩的強化射擊、盾的防禦相關效果約為 2 倍以上。',
       '腐敗、睡眠屬性的武器，第一個效果欄位固定是「攻擊附加腐敗／睡眠」，少了一次隨機抽選。',
       '表中是單一欄位的抽選機率。同一把武器的多個效果之間可能有不重複的規則（資料中有相容性分組），這部分尚未驗證。',
@@ -298,14 +298,14 @@ const T = {
       '頭目的每一列掉落視為一個獎勵選項，「至少出現一次」= 1 − Π(1 − 各選項機率)。寶箱與一般敵人掉落未列入。',
       '「職業武器」獎勵欄位只會出「易發現的武器種」。平常是角色預設（追蹤者→大劍、女爵→短劍…）；深夜模式可以自己指定，指定後這一欄必定是該武器種，整體機率會跟著改變（例如指定重刺劍時，王朝劍技的機率會大幅提高）。「10 名平均」是把 10 名角色的預設等權平均。',
       '普通戰技依遊戲資料的排序分組（重質系・銳利系・優質系・神秘系，即原作戰灰的預設變質）。黑夜君臨已取消這些變質，分組只是方便查找，不影響機率。',
-      'Variant / Condemned / Cataclysm 為遊戲資料內的版本標記（較強或特殊狀態的同一頭目），預設只顯示一般版本。'
+      '變異個體、罪人、災域是同一頭目的不同版本（遊戲資料中各有獨立的掉落表；罪人版本只出現在寧姆韋德的據點，災域版本只出現在大空洞的據點）。預設只顯示一般版本。'
     ]
   },
   ja: {
     title: 'ナイトレイン 戦技ファインダー', sub: '戦技を選ぶと、入手しやすい場所と武器種を表示します',
     skill: '戦技（複数選択可・もう一度押すと解除）', pick: '上で戦技を1つ以上選んでください。', sep: '、', search: '戦技名で検索…', cls: '見つけやすい武器種（「キャラ武器」報酬枠に影響）', avg: 'キャラ既定・10キャラ平均', grpHero: 'キャラ既定', grpType: '武器種を指定（深き夜）',
-    map: 'マップ', mapAll: 'すべて', limveld: '通常マップ', hollow: '大空洞（DLC）',
-    vars: 'バージョン', vbase: '通常', vv: 'Variant 変異', vc: 'Condemned', vx: 'Cataclysm 大変動',
+    map: 'マップ', mapAll: 'すべて', limveld: 'リムベルド', hollow: '大空洞（DLC）',
+    vars: 'バージョン', vbase: '通常', vv: '変異体', vc: '罪人', vx: '災域',
     kinds: '入手元', ksite: '属性マークのある拠点（野営地・遺跡・大教会…）', kother: 'その他のボス（フィールド・城・封牢・地変…）',
     locs: 'おすすめの場所', locsE: 'ボス撃破 → 報酬の選択肢', hintLocs: '％＝ボス撃破後の報酬の選択肢に、選んだ戦技（いずれか）の武器が少なくとも1つ出る確率。',
     sub1: '各選択肢', detail: '武器種の内訳', hintTypes: '条件付き確率＝ここでその武器種が出たとき、戦技がこれになる確率（報酬枠ごとに計算）。「通常の枠」は全武器種から抽選される枠、「キャラ武器枠」は「見つけやすい武器種」だけが出る枠で、戦技プールが異なる場合があります。「割合」＝この戦技の武器のうち、その武器種が占める割合。',
@@ -337,7 +337,7 @@ const T = {
     enTitle: '付帯効果の抽選について',
     enNotes: [
       '効果枠の数はレア度で決まります：コモン 0～1、アンコモンとレア 1。深き夜ではアンコモン・レア武器が「呪い＋効果＋追加効果」の3枠になります。',
-      '祝福枠は「Unique」等級の武器の3枠目です。この武器は常に「呪い＋効果＋祝福」で、2枠目は通常の効果、3枠目の祝福ではタメ攻撃の特殊効果など強力な効果が抽選されます。Variant／Condemned／Cataclysm 版のボスと一部の特殊な敵からのみドロップします。',
+      '祝福枠は「Unique」等級の武器の3枠目です。この武器は常に「呪い＋効果＋祝福」で、2枠目は通常の効果、3枠目の祝福ではタメ攻撃の特殊効果など強力な効果が抽選されます。主に変異体版のボスがドロップします（拠点・城・フィールドボスで約35%～100%、封牢で5%～35%）。災域・罪人版の拠点ボスは最初の報酬枠で2.5%～10%、通常版のボスはドロップしません。',
       'ほとんどの効果はどの武器でも同じ確率ですが、武器カテゴリごとに得意な効果の重みが高くなっています（杖の魔術強化、弓の射撃強化、盾のガード系など、約2倍以上）。',
       '腐敗・睡眠属性の武器は、最初の効果枠が「攻撃に腐敗／睡眠が付く」に固定され、ランダム抽選が1回少なくなります。',
       '表は効果枠1つあたりの確率です。同じ武器の複数の効果の間には重複しない規則がある可能性があります（データに互換グループあり、未検証）。',
@@ -351,7 +351,7 @@ const T = {
       'ボスのドロップ各行を報酬の選択肢1つとみなし、「少なくとも1回」＝ 1 − Π(1 − 各選択肢の確率) で計算しています。宝箱や雑魚敵のドロップは含みません。',
       '「キャラ武器」報酬枠からは「見つけやすい武器種」だけが出ます。通常はキャラ既定（追跡者→大剣、レディ→短剣 など）、深き夜では自分で指定でき、その武器種が必ず出るため全体の確率が変わります（例：重刺剣を指定すると王朝剣技の確率が大きく上がる）。「10キャラ平均」は各キャラ既定の等重み平均です。',
       '標準の戦技はゲームデータの並び順で分類しています（重厚系・鋭利系・質系・神秘系＝原作の戦灰の初期派生）。ナイトレインではこれらの派生は廃止されており、分類は探しやすくするためで確率には影響しません。',
-      'Variant / Condemned / Cataclysm はゲームデータ上のバージョン表記（強化版や特殊状態のボス）です。初期表示は通常版のみ。'
+      '変異体・罪人・災域は同じボスの別バージョンです（ゲームデータ上それぞれ別のドロップ表を持ち、罪人版はリムベルドの拠点、災域版は大空洞の拠点にのみあります）。初期表示は通常版のみ。'
     ]
   },
   en: {
@@ -390,7 +390,7 @@ const T = {
     enTitle: 'How passive effects roll',
     enNotes: [
       'Rarity sets the number of effect slots: Common 0 to 1, Uncommon and Rare 1. In Deep of Night, Uncommon and Rare weapons switch to three slots: curse + effect + extra effect.',
-      'The blessing slot is the third slot of "Unique" tier weapons, which always have curse + effect + blessing: the second slot is a regular effect, and the blessing rolls stronger effects such as charge-attack procs. These weapons only drop from Variant / Condemned / Cataclysm bosses and a few special enemies.',
+      'The blessing slot is the third slot of "Unique" tier weapons, which always have curse + effect + blessing: the second slot is a regular effect, and the blessing rolls stronger effects such as charge-attack procs. They mostly drop from Variant bosses (about 35% to 100% at sites, castles and field bosses, 5% to 35% at evergaols); Cataclysm and Condemned site bosses have 2.5% to 10% in the first reward choice; normal bosses never drop them.',
       'Most effects have the same odds on every weapon, but each weapon group weights its specialty higher: Improved Sorceries on staves, Improved Ranged Weapon Attacks on bows, guard effects on shields, each roughly double or more.',
       'Rot and Sleep affinity weapons have their first slot fixed to the status effect, so they get one fewer random roll.',
       'The table shows one slot\'s odds. Several effects on one weapon may follow a no-duplicate rule (the data has compatibility groups); this is not verified.',
@@ -404,7 +404,7 @@ const T = {
       'Each drop row of a boss counts as one reward choice; "at least once" = 1 − Π(1 − p of each choice). Chests and regular enemies are not included.',
       'The class-weapon reward slot only rolls the favoured weapon type. Normally that is the hero default (Wylder → greatswords, Duchess → daggers…); in Deep of Night you can pick it yourself, and the slot then always gives that type, which shifts the overall odds (picking heavy thrusting swords makes Dynast\'s Finesse much more likely). "Average of 10" weights each hero default equally.',
       'Standard skills are grouped by the game data\'s sort order (Heavy, Keen, Quality, Occult: the default affinities of the original Ashes of War). Nightreign removed these affinities; the groups only make skills easier to find and do not change the odds.',
-      'Variant / Condemned / Cataclysm are version tags in the game data (stronger or special states of the same boss). Only the normal version is shown by default.'
+      'Variant, Condemned and Cataclysm are other versions of the same boss, each with its own drop table in the game data (Condemned versions only exist at Limveld sites, Cataclysm versions only at Great Hollow sites). Only the normal version is shown by default.'
     ]
   }
 };
