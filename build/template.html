@@ -254,7 +254,8 @@ const T = {
     tabSkill: '戰技', tabEffect: '附加效果',
     eff: '附加效果', esearch: '搜尋效果名稱…', eg: { reg: '一般效果', dn: '深き夜・額外效果', bless: '深き夜・祝福', curse: '深き夜・詛咒', fixed: '僅固定效果' },
     hPool: '每次抽選機率', ePool: '依武器種與強度', hintPool: '一個效果欄位抽中此效果的機率。強度 1／2／3 分別對應普通／精良／稀有武器。',
-    hFixed: '帶此固定效果的武器', hintFixed: '這些武器的效果欄位直接寫死為此效果（或只在少數效果中抽選），拿到就有。', nFixed: n => `${n} 把`,
+    hFixed: '帶此固定效果的武器', hintFixed: '這些武器的效果是預先設定好的。「掉落」是頭目或寶箱會掉出的版本（多半是腐敗、睡眠屬性或弓的屬性版本）；「稀有商人」是商人販售的固定組合，不會從掉落取得。', nFixed: n => `${n} 把`,
+    src: '來源', srcDrop: '掉落', srcShop: '稀有商人', srcShopDn: '深き夜的稀有商人', showAll: n => `顯示全部 ${n} 把`,
     tier: ['強度 1', '強度 2', '強度 3'], lvl: ['詛咒 1', '詛咒 2', '詛咒 3'], once: '每次抽選',
     sReg: '一般欄位', sDn: '深き夜・額外欄位', sBless: '深き夜・祝福欄位', sCurse: '深き夜・詛咒欄位',
     pg: { melee: '近戰武器', shield: '盾・火把', staff: '手杖', seal: '聖印記', ranged: '弓・弩', 'Melee': '近戰武器', 'Bow': '小弓・弓', 'Heavy Ranged': '大弓・弩・弩砲', 'Magic': '手杖・聖印記', 'Shield': '盾' },
@@ -300,7 +301,8 @@ const T = {
     tabSkill: '戦技', tabEffect: '付帯効果',
     eff: '付帯効果', esearch: '効果名で検索…', eg: { reg: '通常の効果', dn: '深き夜・追加効果', bless: '深き夜・祝福', curse: '深き夜・呪い', fixed: '固定効果のみ' },
     hPool: '1回あたりの抽選確率', ePool: '武器種・強度別', hintPool: '効果枠1つでこの効果が出る確率。強度1／2／3はコモン／アンコモン／レア武器に対応します。',
-    hFixed: 'この効果が固定の武器', hintFixed: 'これらの武器は効果枠がこの効果に固定（または少数の効果から抽選）されていて、入手すれば必ず付いています。', nFixed: n => `${n} 本`,
+    hFixed: 'この効果が固定の武器', hintFixed: 'これらの武器の効果はあらかじめ決まっています。「ドロップ」はボスや宝箱から出る版（主に腐敗・睡眠属性や弓の属性版）、「レア商人」は商人が売る固定の組み合わせで、ドロップでは手に入りません。', nFixed: n => `${n} 本`,
+    src: '入手', srcDrop: 'ドロップ', srcShop: 'レア商人', srcShopDn: '深き夜のレア商人', showAll: n => `全 ${n} 本を表示`,
     tier: ['強度1', '強度2', '強度3'], lvl: ['呪い1', '呪い2', '呪い3'], once: '1回あたり',
     sReg: '通常の効果枠', sDn: '深き夜・追加効果枠', sBless: '深き夜・祝福枠', sCurse: '深き夜・呪い枠',
     pg: { melee: '近接武器', shield: '盾・松明', staff: '杖', seal: '聖印', ranged: '弓・クロスボウ', 'Melee': '近接武器', 'Bow': '小弓・弓', 'Heavy Ranged': '大弓・クロスボウ・バリスタ', 'Magic': '杖・聖印', 'Shield': '盾' },
@@ -346,7 +348,8 @@ const T = {
     tabSkill: 'Skills', tabEffect: 'Passive effects',
     eff: 'Passive effect', esearch: 'Search effects…', eg: { reg: 'Regular effects', dn: 'Deep of Night extra', bless: 'Deep of Night blessing', curse: 'Deep of Night curse', fixed: 'Fixed only' },
     hPool: 'Chance per roll', ePool: 'by weapon group and potency', hintPool: 'Chance that one effect slot rolls this effect. Potency 1 / 2 / 3 matches Common / Uncommon / Rare weapons.',
-    hFixed: 'Weapons with this fixed effect', hintFixed: 'These weapons have the effect written into their slot (or roll it from a very small list), so you get it whenever you find them.', nFixed: n => `${n} weapons`,
+    hFixed: 'Weapons with this fixed effect', hintFixed: 'These weapons come with the effect preset. "Drop" versions come from bosses or chests (mostly Rot/Sleep affinity weapons and affinity bows); "Rare Merchant" entries are fixed combinations sold by the merchant and never drop.', nFixed: n => `${n} weapons`,
+    src: 'Source', srcDrop: 'Drop', srcShop: 'Rare Merchant', srcShopDn: 'Deep of Night Rare Merchant', showAll: n => `Show all ${n}`,
     tier: ['Potency 1', 'Potency 2', 'Potency 3'], lvl: ['Curse 1', 'Curse 2', 'Curse 3'], once: 'Per roll',
     sReg: 'Regular slot', sDn: 'Deep of Night extra slot', sBless: 'Deep of Night blessing slot', sCurse: 'Deep of Night curse slot',
     pg: { melee: 'Melee weapons', shield: 'Shields & torches', staff: 'Staves', seal: 'Sacred seals', ranged: 'Bows & crossbows', 'Melee': 'Melee weapons', 'Bow': 'Light bows & bows', 'Heavy Ranged': 'Greatbows, crossbows & ballistae', 'Magic': 'Staves & seals', 'Shield': 'Shields' },
@@ -750,11 +753,17 @@ function renderEffect() {
   $('pools').innerHTML = html ? `<tbody>${html}</tbody>` : `<tbody><tr><td class="empty">—</td></tr></tbody>`;
 
   // fixed-effect weapons
-  const fx = e.fixed.slice().sort((a, b) => b[1] - a[1] || (E.ewep[a[0]][1] - E.ewep[b[0]][1]) || nm(E.ewep[a[0]][0]).localeCompare(nm(E.ewep[b[0]][0])));
+  const srcRank = r => r[4] === 'drop' ? (r[2] === 'n' ? 0 : 1) : (r[2] === 'n' ? 2 : 3);
+  const fx = e.fixed.slice().sort((a, b) => srcRank(a) - srcRank(b) || b[1] - a[1] || (E.ewep[a[0]][1] - E.ewep[b[0]][1]) || nm(E.ewep[a[0]][0]).localeCompare(nm(E.ewep[b[0]][0])));
   $('e-fixed').textContent = fx.length ? t.nFixed(fx.length) : '';
-  $('fixed').innerHTML = fx.length ? `<thead><tr><th>${t.wep}</th><th>${t.type}</th><th>${t.rarity}</th><th></th></tr></thead><tbody>` +
-    fx.map(([w, rar, mode, p]) => `<tr><td><span class="rar" style="background:var(--r${Math.min(3, rar)})"></span>${esc(nm(E.ewep[w][0]))}</td><td>${esc(nm(D.types[E.ewep[w][1]]) || '')}</td><td>${t.rar[Math.min(3, rar)]}</td><td>${mode === 'd' ? `<span class="flag">${t.dnOnly}</span> ` : ''}${p < 0.999 ? t.chance(pct(p, 0)) : ''}</td></tr>`).join('') + '</tbody>'
+  const LIMIT = 30, shown = est.all || fx.length <= LIMIT + 5 ? fx : fx.slice(0, LIMIT);
+  const srcCell = ([, , mode, p, src]) => (src === 'drop' ? t.srcDrop + (mode === 'd' ? ` <span class="flag">${t.dnOnly}</span>` : '') : mode === 'd' ? t.srcShopDn : t.srcShop) + (p < 0.999 ? ` · ${t.chance(pct(p, 0))}` : '');
+  $('fixed').innerHTML = fx.length ? `<thead><tr><th>${t.wep}</th><th>${t.type}</th><th>${t.rarity}</th><th>${t.src}</th></tr></thead><tbody>` +
+    shown.map(r => `<tr><td><span class="rar" style="background:var(--r${Math.min(3, r[1])})"></span>${esc(nm(E.ewep[r[0]][0]))}</td><td>${esc(nm(D.types[E.ewep[r[0]][1]]) || '')}</td><td>${t.rar[Math.min(3, r[1])]}</td><td>${srcCell(r)}</td></tr>`).join('') +
+    (shown.length < fx.length ? `<tr><td colspan="4"><button type="button" class="chip" id="fx-all">${t.showAll(fx.length)}</button></td></tr>` : '') + '</tbody>'
     : `<tbody><tr><td class="empty">${t.noFixed}</td></tr></tbody>`;
+  const more = $('fx-all');
+  if (more) more.addEventListener('click', () => { est.all = true; renderEffect(); });
 }
 
 function renderEffStatic() {
@@ -781,7 +790,7 @@ $('eq').addEventListener('input', renderEffList);
 $('efflist').addEventListener('click', ev => {
   const b = ev.target.closest('[data-eff]');
   if (!b) return;
-  est.sel = b.dataset.eff;
+  est.sel = b.dataset.eff; est.all = false;
   document.querySelectorAll('#efflist .chip[aria-pressed="true"]').forEach(x => x.setAttribute('aria-pressed', 'false'));
   b.setAttribute('aria-pressed', 'true');
   renderEffect();
